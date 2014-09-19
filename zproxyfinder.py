@@ -41,7 +41,8 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
  username=johndoe
  password=verysecretpassword
  api=https://zabbix.mycompany.com/path/to/zabbix/frontend/
-       
+ no_verify=true
+
 """)
 parser.add_argument('hostname', help='Hostname to find the defined Zabbix proxy for')
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
