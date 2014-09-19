@@ -7,6 +7,7 @@ import argparse
 import ConfigParser
 import os
 import os.path
+import distutils.util
 from pyzabbix import ZabbixAPI
 
 # define config helper function
@@ -29,6 +30,7 @@ defconf = os.getenv("HOME") + "/.zbx.conf"
 username = ""
 password = ""
 api = ""
+noverify = ""
 
 # Define commandline arguments
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Tries to get the assigned Zabbix proxy for the specified Zabbix host.', epilog="""
@@ -45,6 +47,7 @@ parser.add_argument('hostname', help='Hostname to find the defined Zabbix proxy 
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
+parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
 parser.add_argument('-n', '--numeric', help='Return numeric proxyid instead of proxy name',action='store_true')
 args = parser.parse_args()
@@ -68,6 +71,7 @@ try:
  username=ConfigSectionMap("Zabbix API")['username']
  password=ConfigSectionMap("Zabbix API")['password']
  api=ConfigSectionMap("Zabbix API")['api']
+ noverify=bool(distutils.util.strtobool(ConfigSectionMap("Zabbix API")["no_verify"]))
 except:
  pass
 
@@ -80,6 +84,9 @@ if args.password:
 
 if args.api:
  api = args.api
+
+if args.no_verify:
+ noverify = args.no_verify
 
 # test for needed params
 if not username:
@@ -96,6 +103,9 @@ if not api:
 
 # Setup Zabbix API connection
 zapi = ZabbixAPI(api)
+
+if noverify is True:
+ zapi.session.verify = False
 
 # Login to the Zabbix API
 zapi.login(username, password)
