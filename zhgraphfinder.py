@@ -33,7 +33,7 @@ api = ""
 noverify = ""
 
 # Define commandline arguments
-parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Tries to get the linked templates for the specified Zabbix host.', epilog="""
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Tries to get the configured graphs for the specified Zabbix host.', epilog="""
 This program can use .ini style configuration files to retrieve the needed API connection information.
 To use this type of storage, create a conf file (the default is $HOME/.zbx.conf) that contains at least the [Zabbix API] section and any of the other parameters:
        
@@ -44,13 +44,14 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
  no_verify=true
 
 """)
-parser.add_argument('hostname', help='Hostname to find the linked templates for')
+parser.add_argument('hostname', help='Hostname to find the configured graphs for')
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
 parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
-parser.add_argument('-n', '--numeric', help='Return numeric templateids instead of template names',action='store_true')
+parser.add_argument('-n', '--numeric', help='Return numeric graphid instead of graph name',action='store_true')
+parser.add_argument('-e', '--extended', help='Return both graphid and graph name separated with a ":"',action='store_true')
 args = parser.parse_args()
 
 # load config module
@@ -122,19 +123,24 @@ host_name = args.hostname
 hosts = zapi.host.get(output="extend", filter={"host": host_name})
 
 if hosts:
-    # Find linked templates
-    templates = zapi.template.get(output="extend", hostids=hosts[0]["hostid"])
-    if templates:
-      if args.numeric:
-         # print template ids
-	 for template in templates:
-	   print(format(template["templateid"]))
-      else:
-         # print template names
-	 for template in templates:
-	   print(format(template["host"]))
+    # Find defined graphs
+    graphs = zapi.graph.get(output="extend", hostids=hosts[0]["hostid"])
+    if graphs:
+      if args.extended:
+        # print graphs ids and graph names
+        for graph in graphs:
+	  print(format(graph["graphid"])+":"+format(graph["name"]))
+      else:	  
+        if args.numeric:
+          # print graph ids
+	  for graph in graphs:
+	    print(format(graph["graphid"]))
+        else:
+          # print graph names
+	  for graph in graphs:
+	    print(format(graph["name"]))
     else:
-       print("Error: No templates linked to "+ host_name)
+       print("Error: No graphs defined on "+ host_name)
 else:
     print("Error: Could not find host "+ host_name)
 

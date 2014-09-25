@@ -50,7 +50,7 @@ parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
 parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
-parser.add_argument('-n', '--numeric', help='Return numeric proxyid instead of proxy name',action='store_true')
+parser.add_argument('-n', '--numeric', help='Return numeric hostids instead of host name',action='store_true')
 args = parser.parse_args()
 
 # load config module
