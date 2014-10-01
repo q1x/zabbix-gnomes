@@ -130,6 +130,7 @@ graphid = args.graphid
 graph = zapi.graph.get(output="extend", graphids=graphid)
 
 if graph:
+  #print(format(graph))
   # Set width and height
   if args.width:
     width = args.width
@@ -140,9 +141,26 @@ if graph:
   else:
     height = graph[0]['height']
 
+  
+  # Select the right graph generator according to graph type
+  # type 3 = Exploded graph
+  if graph[0]['graphtype'] == "3":
+    generator = "chart6.php"
+  # type 2 = Pie graph
+  elif graph[0]['graphtype'] == "2":
+    generator = "chart6.php"
+  # type 1 = Stacked graph
+  elif graph[0]['graphtype'] == "1":
+    generator = "chart2.php"
+  # type 0 = Normal graph
+  elif graph[0]['graphtype'] == "0":
+    generator = "chart2.php"
+  # catch-all in case someone invents a new type/generator
+  else:
+    generator = "chart2.php"
+
   # Set time period
   period = args.timeperiod
-
 
   # set the starting time for the graph
   if args.starttime:
@@ -150,7 +168,7 @@ if graph:
   else:
      stime=time.time()-period
 
-  # Set login URL for the Frontend (frontend access is neededi, as we cannot retrieve graph images via the API)
+  # Set login URL for the Frontend (frontend access is needed, as we cannot retrieve graph images via the API)
   loginurl = api + "/index.php"
   # Data that needs to be posted to the Frontend to log in
   logindata = {'autologin' : '1', 'name' : username, 'password' : password, 'enter' : 'Sign in'}
@@ -168,7 +186,7 @@ if graph:
     if session.cookies['zbx_sessionid']:
 
        # Build the request for the graph
-       graphurl = api + "/chart2.php?graphid=" + str(graphid) + "&period=" + str(period) + "&width=" + str(width) + "&height=" + str(height) + "&stime=" + str(stime)
+       graphurl = api + "/" + generator + "?graphid=" + str(graphid) + "&period=" + str(period) + "&width=" + str(width) + "&height=" + str(height) + "&stime=" + str(stime)
 
        # get the graph
        graphreq = session.get(graphurl)
