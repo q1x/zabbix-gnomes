@@ -3,6 +3,9 @@
 # import needed modules.
 # pyzabbix is needed, see https://github.com/lukecyca/pyzabbix
 #
+# Pillow is also needed, see https://github.com/python-pillow/Pillow
+#
+#
 import argparse
 import ConfigParser
 import os
@@ -141,7 +144,6 @@ if graph:
   else:
     height = graph[0]['height']
 
-  
   # Select the right graph generator according to graph type
   # type 3 = Exploded graph
   if graph[0]['graphtype'] == "3":
