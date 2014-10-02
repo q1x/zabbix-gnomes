@@ -65,7 +65,7 @@ Take note that this requires GNU `date`.
 ##### Using the zapi.py API client to test Zabbix API calls:
 
 ```
-Logging in on 'https://zabbix.exmple.com/' with user 'Admin'.
+Logging in on 'https://zabbix.example.com/' with user 'Admin'.
 Welcome to the interactive Zabbix API client.
 zapi: z host.get(filter={"host": "Zabbix Server"})
 [{u'hostid': u'1001'}]
