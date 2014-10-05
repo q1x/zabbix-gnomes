@@ -51,6 +51,7 @@ parser.add_argument('-a', '--api', help='Zabbix API URL')
 parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
 parser.add_argument('-n', '--numeric', help='Return numeric proxyid instead of proxy name',action='store_true')
+parser.add_argument('-e', '--extended', help='Return both proxyid and proxy name separated with a ":"',action='store_true')
 args = parser.parse_args()
 
 # load config module
@@ -124,17 +125,18 @@ hosts = zapi.host.get(output="extend", filter={"host": host_name})
 if hosts:
     # Find proxy hostid
     host_proxyid = hosts[0]["proxy_hostid"]
-
     if host_proxyid != "0":
-       if args.numeric:
-         # print proxy id
-	 print(format(host_proxyid))
-       else:
-         # Find proxy name
-	 proxy = zapi.proxy.get(output="extend", proxyids=host_proxyid)
-	 proxy_name = proxy[0]["host"]
-         if proxy_name:
-	    # Return proxy name
+      proxy = zapi.proxy.get(output="extend", proxyids=host_proxyid)
+      proxy_name = proxy[0]["host"]
+      if args.extended:
+          # print id and name
+          print(format(host_proxyid)+":"+format(proxy_name))
+      else:
+          if args.numeric:
+            # print proxy id
+            print(format(host_proxyid))
+          else:
+  	    # Return proxy name
             print(format(proxy_name))
     else:
       print("Error: No proxy defined for "+ host_name)
