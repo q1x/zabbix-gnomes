@@ -51,6 +51,7 @@ parser.add_argument('-a', '--api', help='Zabbix API URL')
 parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
 parser.add_argument('-n', '--numeric', help='Return numeric templateids instead of template names',action='store_true')
+parser.add_argument('-e', '--extended', help='Return both templateid and template name separated with a ":"',action='store_true')
 args = parser.parse_args()
 
 # load config module
@@ -125,14 +126,19 @@ if hosts:
     # Find linked templates
     templates = zapi.template.get(output="extend", hostids=hosts[0]["hostid"])
     if templates:
-      if args.numeric:
-         # print template ids
+      if args.extended:
+         # print ids and names
 	 for template in templates:
-	   print(format(template["templateid"]))
+	   print(format(template["templateid"])+":"+format(template["host"]))
       else:
-         # print template names
-	 for template in templates:
-	   print(format(template["host"]))
+        if args.numeric:
+           # print template ids
+	   for template in templates:
+	     print(format(template["templateid"]))
+        else:
+           # print template names
+	   for template in templates:
+	     print(format(template["host"]))
     else:
        print("Error: No templates linked to "+ host_name)
 else:
