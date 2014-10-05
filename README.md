@@ -15,7 +15,7 @@ Graph related:
 
 Proxy related:
 --------------
-- zproxyfinder.py -	Finds configured proxy for a Zabbix host
+- zhproxyfinder.py -	Finds configured proxy for a Zabbix host
 
 Template related:
 -----------------
@@ -59,7 +59,7 @@ Take note that this requires GNU `date`.
 
 ##### Using zproxyfinder.py to use the proper Zabbix proxy in a zabbix_sender script.
 
-`zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zproxyfinder.py $HOSTNAME)`
+`zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOSTNAME)`
 
 
 ##### Using the zapi.py API client to test Zabbix API calls:
