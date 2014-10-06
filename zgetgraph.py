@@ -13,6 +13,7 @@ import os.path
 import distutils.util
 import requests
 import time
+import sys
 from cStringIO import StringIO
 from PIL import Image
 from pyzabbix import ZabbixAPI
@@ -102,16 +103,13 @@ if args.no_verify:
 
 # test for needed params
 if not username:
- print("Error: API User not set")
- exit()
+ sys.exit("Error: API User not set")
 
 if not password:
- print("Error: API Password not set")
- exit()
+ sys.exit("Error: API Password not set")
  
 if not api:
- print("Error: API URL is not set")
- exit()
+ sys.exit("Error: API URL is not set")
 
 # Setup Zabbix API connection
 zapi = ZabbixAPI(api)
@@ -200,9 +198,8 @@ if graph:
        graphpng.save(args.filename)
 
   except:
-       print("Error: Could not log in to retrieve graph")
-
+       sys.exit("Error: Could not log in to retrieve graph")
 else:
-    print("Error: Could not find graphid "+ graphid)
+    sys.exit("Error: Could not find graphid "+ graphid)
 
 # And we're done...

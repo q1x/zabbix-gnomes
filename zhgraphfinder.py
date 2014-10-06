@@ -7,6 +7,7 @@ import argparse
 import ConfigParser
 import os
 import os.path
+import sys
 import distutils.util
 from pyzabbix import ZabbixAPI
 
@@ -92,16 +93,13 @@ if args.no_verify:
 
 # test for needed params
 if not username:
- print("Error: API User not set")
- exit()
+ sys.exit("Error: API User not set")
 
 if not password:
- print("Error: API Password not set")
- exit()
+ sys.exit("Error: API Password not set")
  
 if not api:
- print("Error: API URL is not set")
- exit()
+ sys.exit("Error: API URL is not set")
 
 # Setup Zabbix API connection
 zapi = ZabbixAPI(api)
@@ -140,8 +138,8 @@ if hosts:
 	  for graph in graphs:
 	    print(format(graph["name"]))
     else:
-       print("Error: No graphs defined on "+ host_name)
+       sys.exit("Error: No graphs defined on "+ host_name)
 else:
-    print("Error: Could not find host "+ host_name)
+    sys.exit("Error: Could not find host "+ host_name)
 
 # And we're done...
