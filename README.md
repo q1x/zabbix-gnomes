@@ -3,22 +3,19 @@ zabbix-gnomes
 
 A collection of various scripts to automate tasks with the Zabbix API. My main goal is to create a set of simple utilities that can be reused in shell scripts without using a lot of curl voodoo.
 
+All of these tools can be invoked with -h/--help to get help.
 
-API tools:
-----------
+### API tools:
 - zapi.py -		Interactive Zabbix API client.
 
-Graph related:
---------------
+### Graph related:
 - zhgraphfinder.py - 	Finds graphs configured on a Zabbix host
 - zgetgraph.py - 	Downloads a graph .PNG from the Zabbix frontend and saves it.
 
-Proxy related:
---------------
+### Proxy related:
 - zhproxyfinder.py -	Finds configured proxy for a Zabbix host
 
-Template related:
------------------
+### Template related:
 - zhtmplfinder.py - 	Finds linked templates for a Zabbix host
 - zthostfinder.py - 	Finds hosts that are linked to a template
 
