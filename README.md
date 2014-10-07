@@ -18,7 +18,7 @@ All of these tools can be invoked with `-h/--help` to get help.
 ### Template related:
 - `zhtmplfinder.py` - 	Finds linked templates for a Zabbix host
 - `zthostfinder.py` - 	Finds hosts that are linked to a template
-
+- `zthtmllinker.py` - 	Links host(group)s to a list of templates
 
 Configuration
 -------------
@@ -58,6 +58,11 @@ Take note that this requires GNU `date`.
 
 `zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOSTNAME)`
 
+##### Using zhtmpllinker.py to link 3 templates to all the hosts in a hostgroup:
+
+```
+./zhtmpllinker.py -t "Template App Apache" "Template App MySQL" "Template OS Linux" -G "LAMP Servers"
+```
 
 ##### Using the zapi.py API client to test Zabbix API calls:
 
@@ -68,5 +73,6 @@ zapi: z host.get(filter={"host": "Zabbix Server"})
 [{u'hostid': u'1001'}]
 zapi: 
 ```
+
 
 

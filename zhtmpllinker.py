@@ -56,6 +56,8 @@ parser.add_argument('-a', '--api', help='Zabbix API URL')
 parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
 parser.add_argument('-n', '--numeric', help='Use numeric ids instead of names, applies to -t, -H and -G',action='store_true')
+parser.add_argument('-e', '--extended', help='Extended output',action='store_true')
+
 args = parser.parse_args()
 
 # load config module
@@ -131,7 +133,7 @@ if args.hostgroups:
      # We are using hostgroup names, let's resolve them to ids.
      # First, get the named hostgroups via an API call
      hglookup = zapi.hostgroup.get(filter=({'name':args.hostgroups}))  
-  
+
      # hgids will hold the numeric hostgroup ids
      hgids = []
      for hg in range(len(hglookup)):
@@ -140,104 +142,74 @@ if args.hostgroups:
 
   # Now that we have resolved the hostgroup ids, we can make an API call to retrieve the member hosts
   hlookup=zapi.host.get(output=['hostid'],groupids=hgids)
-  
-  # hids will hold the numeric host ids
-  hids=[]
-  for h in range(len(hlookup)):
-     # Creat a list of host ids
-     hids.append(int(hlookup[h]['hostid']))
 
 elif args.hostnames:
   if args.numeric:
      # We are getting numeric host ID's, let put them in a list
      # (ignore any non digit items)
      hids=[s for s in args.hostnames if s.isdigit()]  
+     hlookup = []
      for hid in hids:
        exists=zapi.host.exists(hostid=hid)
        if not exists:
           sys.exit("Error: Hostid "+hid+" does not exist")
+       if not hlookup:
+          hlookup = [{unicode('hostid'): unicode(hid)}]
+       else:
+          hlookup.append({unicode('hostid'): unicode(hid)})
+
   else:
      # We are using hostnames, let's resolve them to ids.
      # Get hosts via an API call
      hlookup = zapi.host.get(filter=({'host':args.hostnames}))  
   
      # hids will hold the numeric host ids
-     hids = []
-     for h in range(len(hlookup)):
-        # Create the list of host ids
-        hids.append(int(hlookup[h]['hostid']))
+     #hids = []
+     #for h in range(len(hlookup)):
+     #   # Create the list of host ids
+     #   hids.append(int(hlookup[h]['hostid']))
 
 
 else:
   #uhm... what were we supposed to do?
   sys.exit("Error: Nothing to do here")
 
-if not hids:
+if not hlookup:
  sys.exit("Error: No hosts found")
-print(hids)
-
 
 if args.numeric:
    # We are getting numeric template ID's, let put them in a list
    # (ignore any non digit items)
    tids=[s for s in args.templates if s.isdigit()]  
+   tlookup=[]
    for tid in tids:
-     exists=zapi.template.exists(templateid=tid)
+     exists=zapi.template.exists(hostid=tid)
      if not exists:
         sys.exit("Error: Templateid "+tid+" does not exist")
+     if not tlookup:
+        tlookup = [{unicode('templateid'): unicode(tid)}]
+     else:
+       tlookup.append({unicode('templateid'): unicode(tid)})
+
 else:
    # We are using template names, let's resolve them to ids.
    # Get templates via an API call
    tlookup = zapi.template.get(filter=({'host':args.templates}))  
-   print(tlookup) 
-   # tids will hold the numeric templateids
-   tids = []
-   for t in range(len(tlookup)):
-      # Create the list of templateids
-      tids.append(int(tlookup[t]['templateid']))
 
-print(tids)
+try:
+ # Apply the linkage
+ result=zapi.host.massadd(hosts=hlookup,templates=tlookup)
+except:
+ sys.exit("Error: Something went wrong while performing the update")
 
-#try:
-# # Apply the linkage
-# zapi.host.massadd
-
-
-#zapi: z host.massadd(hosts=[{u'hostid': u'10084'}],templates=[{u'templateid': u'10107'}])
-
-#{u'hostids': [u'10084']}
-
-
-
-##set the hostname we are looking for
-#host_name = args.hostnames
-#
-## Find specified host from API
-#hosts = zapi.host.get(output="extend", filter={"host": host_name})
-#
-#if hosts:
-#    # Find linked templates
-#    templates = zapi.template.get(output="extend", hostids=hosts[0]["hostid"])
-#    if templates:
-#      if args.extended:
-#         # print ids and names
-#	 for template in templates:
-#	   print(format(template["templateid"])+":"+format(template["host"]))
-#      else:
-#        if args.numeric:
-#           # print template ids
-#	   for template in templates:
-#	     print(format(template["templateid"]))
-#        else:
-#           # print template names
-#	   for template in templates:
-#	     print(format(template["host"]))
-#    else:
-#       sys.exit("Error: No templates linked to "+ host_name)
-#else:
-#    sys.exit("Error: Could not find host "+ host_name)
-#
-
-
+if args.extended:
+  hosts=zapi.host.get(output='extend',hostids=result['hostids'])
+  hostnames=""
+  for host in range(len(hosts)):
+      if not hostnames:
+        hostnames = str(hosts[host]['host'])
+      else:
+        hostnames = hostnames + ", " + str(hosts[host]['host'])
+  print("Link to templates (" + str(len(tlookup)) + ") applied to: " + hostnames)
 
 # And we're done...
