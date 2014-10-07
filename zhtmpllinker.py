@@ -34,7 +34,7 @@ api = ""
 noverify = ""
 
 # Define commandline arguments
-parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Tries to link templates to the specified Zabbix host.', epilog="""
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Tries to link Zabbix hosts to the specified templates. Hosts can be specified seperately or by hostgroups.', epilog="""
 This program can use .ini style configuration files to retrieve the needed API connection information.
 To use this type of storage, create a conf file (the default is $HOME/.zbx.conf) that contains at least the [Zabbix API] section and any of the other parameters:
        
@@ -47,15 +47,15 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
 """)
 
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('-H', '--hostnames' ,help='Hostname(s) to link the template(s) to', nargs='+')
-group.add_argument('-G', '--hostgroups' ,help='Link the template(s) to all the hosts in the specified hostgroup(s)', nargs='+')
+group.add_argument('-H', '--hostnames' ,help='Hostname(s) to link to template(s) to', nargs='+')
+group.add_argument('-G', '--hostgroups' ,help='Link all the hosts in the specified hostgroup(s) to the template(s)', nargs='+')
 parser.add_argument('-t', '--templates', help='Template(s) to link the host(s) to', nargs='+', required=True)
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
 parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
-parser.add_argument('-n', '--numeric', help='Use numeric ids instead of names',action='store_true')
+parser.add_argument('-n', '--numeric', help='Use numeric ids instead of names, applies to -t, -H and -G',action='store_true')
 args = parser.parse_args()
 
 # load config module
@@ -118,25 +118,95 @@ zapi.login(username, password)
 ##################################
 
 if args.hostgroups:
-  if args.numeric == True:
-     # We are using numeric hostgroups, lets see if they exist.
-     print("hostgroup ids")
-
+  if args.numeric:
+     # We are getting numeric hostgroup ID's, let put them in a list
+     # (ignore any non digit items)
+     hgids=[s for s in args.hostgroups if s.isdigit()] 
+     for hgid in hgids:
+       exists=zapi.hostgroup.exists(groupid=hgid)
+       if not exists:
+          sys.exit("Error: Hostgroupid "+hgid+" does not exist")
+ 
   else:
      # We are using hostgroup names, let's resolve them to ids.
-     print("hostgroup names")
+     # First, get the named hostgroups via an API call
+     hglookup = zapi.hostgroup.get(filter=({'name':args.hostgroups}))  
+  
+     # hgids will hold the numeric hostgroup ids
+     hgids = []
+     for hg in range(len(hglookup)):
+        # Create the list of hostgroup ids
+        hgids.append(int(hglookup[hg]['groupid']))
+
+  # Now that we have resolved the hostgroup ids, we can make an API call to retrieve the member hosts
+  hlookup=zapi.host.get(output=['hostid'],groupids=hgids)
+  
+  # hids will hold the numeric host ids
+  hids=[]
+  for h in range(len(hlookup)):
+     # Creat a list of host ids
+     hids.append(int(hlookup[h]['hostid']))
+
 elif args.hostnames:
-  if args.numeric == True:
-     # We are using numeric hostgroups, lets see if they exist.
-     print("host ids")
-
+  if args.numeric:
+     # We are getting numeric host ID's, let put them in a list
+     # (ignore any non digit items)
+     hids=[s for s in args.hostnames if s.isdigit()]  
+     for hid in hids:
+       exists=zapi.host.exists(hostid=hid)
+       if not exists:
+          sys.exit("Error: Hostid "+hid+" does not exist")
   else:
-     # We are using hostgroup names, let's resolve them to ids.
-     print("host names")
+     # We are using hostnames, let's resolve them to ids.
+     # Get hosts via an API call
+     hlookup = zapi.host.get(filter=({'host':args.hostnames}))  
+  
+     # hids will hold the numeric host ids
+     hids = []
+     for h in range(len(hlookup)):
+        # Create the list of host ids
+        hids.append(int(hlookup[h]['hostid']))
+
 
 else:
   #uhm... what were we supposed to do?
   sys.exit("Error: Nothing to do here")
+
+if not hids:
+ sys.exit("Error: No hosts found")
+print(hids)
+
+
+if args.numeric:
+   # We are getting numeric template ID's, let put them in a list
+   # (ignore any non digit items)
+   tids=[s for s in args.templates if s.isdigit()]  
+   for tid in tids:
+     exists=zapi.template.exists(templateid=tid)
+     if not exists:
+        sys.exit("Error: Templateid "+tid+" does not exist")
+else:
+   # We are using template names, let's resolve them to ids.
+   # Get templates via an API call
+   tlookup = zapi.template.get(filter=({'host':args.templates}))  
+   print(tlookup) 
+   # tids will hold the numeric templateids
+   tids = []
+   for t in range(len(tlookup)):
+      # Create the list of templateids
+      tids.append(int(tlookup[t]['templateid']))
+
+print(tids)
+
+#try:
+# # Apply the linkage
+# zapi.host.massadd
+
+
+#zapi: z host.massadd(hosts=[{u'hostid': u'10084'}],templates=[{u'templateid': u'10107'}])
+
+#{u'hostids': [u'10084']}
+
 
 
 ##set the hostname we are looking for
@@ -167,4 +237,7 @@ else:
 #else:
 #    sys.exit("Error: Could not find host "+ host_name)
 #
+
+
+
 # And we're done...
