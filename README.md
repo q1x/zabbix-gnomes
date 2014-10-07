@@ -20,6 +20,9 @@ All of these tools can be invoked with `-h/--help` to get help.
 - `zthostfinder.py` - 	Finds hosts that are linked to a template.
 - `zthtmllinker.py` - 	Links host(group)s to a list of templates.
 
+### Inv related:
+- `zhinvswitcher.py`- 	Switches inv. mode on host(group)s.
+
 Configuration
 -------------
 These programs can use .ini style configuration files to retrieve the needed API connection information.
@@ -62,6 +65,12 @@ Take note that this requires GNU `date`.
 
 ```
 ./zhtmpllinker.py -t "Template App Apache" "Template App MySQL" "Template OS Linux" -G "LAMP Servers"
+```
+
+##### Switch the inventory mode to automatic for all the hosts in a hostgroup
+
+```
+./zhinvswitcher.py -G "Linux Servers" -m auto
 ```
 
 ##### Using the zapi.py API client to test Zabbix API calls:
