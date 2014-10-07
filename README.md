@@ -9,16 +9,16 @@ All of these tools can be invoked with `-h/--help` to get help.
 - `zapi.py` -		Interactive Zabbix API client.
 
 ### Graph related:
-- `zhgraphfinder.py` - 	Finds graphs configured on a Zabbix host
+- `zhgraphfinder.py` - 	Finds graphs configured on a Zabbix host.
 - `zgetgraph.py` - 	Downloads a graph .PNG from the Zabbix frontend and saves it.
 
 ### Proxy related:
-- `zhproxyfinder.py` -	Finds configured proxy for a Zabbix host
+- `zhproxyfinder.py` -	Finds configured proxy for a Zabbix host.
 
 ### Template related:
-- `zhtmplfinder.py` - 	Finds linked templates for a Zabbix host
-- `zthostfinder.py` - 	Finds hosts that are linked to a template
-- `zthtmllinker.py` - 	Links host(group)s to a list of templates
+- `zhtmplfinder.py` - 	Finds linked templates for a Zabbix host.
+- `zthostfinder.py` - 	Finds hosts that are linked to a template.
+- `zthtmllinker.py` - 	Links host(group)s to a list of templates.
 
 Configuration
 -------------
