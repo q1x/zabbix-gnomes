@@ -162,13 +162,6 @@ elif args.hostnames:
      # We are using hostnames, let's resolve them to ids.
      # Get hosts via an API call
      hlookup = zapi.host.get(filter=({'host':args.hostnames}))  
-  
-     # hids will hold the numeric host ids
-     #hids = []
-     #for h in range(len(hlookup)):
-     #   # Create the list of host ids
-     #   hids.append(int(hlookup[h]['hostid']))
-
 
 else:
   #uhm... what were we supposed to do?
@@ -202,6 +195,7 @@ try:
 except:
  sys.exit("Error: Something went wrong while performing the update")
 
+ # Print extended output
 if args.extended:
   hosts=zapi.host.get(output='extend',hostids=result['hostids'])
   hostnames=""
