@@ -59,7 +59,9 @@ Take note that this requires GNU `date`.
 
 ##### Using zproxyfinder.py to use the proper Zabbix proxy in a zabbix_sender script.
 
-`zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOSTNAME)`
+```
+zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOSTNAME)
+```
 
 ##### Using zhtmpllinker.py to link 3 templates to all the hosts in a hostgroup:
 
@@ -67,10 +69,16 @@ Take note that this requires GNU `date`.
 ./zhtmpllinker.py -t "Template App Apache" "Template App MySQL" "Template OS Linux" -G "LAMP Servers"
 ```
 
-##### Switch the inventory mode to automatic for all the hosts in a hostgroup
+##### Switch the inventory mode to manual for all the hosts in a hostgroup
 
 ```
-./zhinvswitcher.py -G "Linux Servers" -m auto
+./zhinvswitcher.py -G "Linux Servers" -m manual
+```
+
+##### Switch the inventory mode to automatic on all the hosts in Zabbix
+
+```
+./zhinvswitcher.py --all-hosts
 ```
 
 ##### Using the zapi.py API client to test Zabbix API calls:
