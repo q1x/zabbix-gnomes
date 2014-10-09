@@ -34,7 +34,7 @@ api = ""
 noverify = ""
 
 # Define commandline arguments
-parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Tries to get the hosts linked to the specified Zabbix template.', epilog="""
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Tries to find member hosts of a Zabbix hostgroup.', epilog="""
 This program can use .ini style configuration files to retrieve the needed API connection information.
 To use this type of storage, create a conf file (the default is $HOME/.zbx.conf) that contains at least the [Zabbix API] section and any of the other parameters:
        
@@ -45,7 +45,7 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
  no_verify=true
 
 """)
-parser.add_argument('template', help='Template to find linked hosts for')
+parser.add_argument('hostgroup', help='Find hosts in this hostgroup')
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
@@ -114,14 +114,14 @@ zapi.login(username, password)
 # Start actual API logic
 ##################################
 
-# Find the template we are looking for
-tmpl_name = args.template
-template = zapi.template.get(output="extend", filter={"host": tmpl_name})
-templateid = template[0]["templateid"]
+# Find the hostgroup we are looking for
+group_name = args.hostgroup
+group = zapi.hostgroup.get(output="extend", filter=({'name': group_name}))
 
-if templateid:
+if group: 
+    groupid = group[0]["groupid"]
     # Find linked hosts
-    hosts = zapi.host.get(output="extend", templateids=templateid) 
+    hosts = zapi.host.get(output="extend", groupids=groupid) 
     if hosts:
       if args.extended:
         # print ids and names
@@ -137,8 +137,8 @@ if templateid:
   	 for host in hosts:
              print(format(host["host"]))
     else:
-       sys.exit("Error: No hosts linked with \""+ tmpl_name +"\"")
+       sys.exit("Error: No hosts in hostgroup \""+ group_name + "\"")
 else:
-   sys.exit("Error: Could not find template \""+ tmpl_name +"\"")
+   sys.exit("Error: Could not find hostgroup \""+ group_name + "\"")
 
 # And we're done...

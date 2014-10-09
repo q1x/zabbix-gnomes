@@ -12,6 +12,9 @@ All of these tools can be invoked with `-h/--help` to get help.
 - `zhgraphfinder.py` - 	Finds graphs configured on a Zabbix host.
 - `zgetgraph.py` - 	Downloads a graph .PNG from the Zabbix frontend and saves it.
 
+### Group related:
+- `zghostfinder.py` -	Finds member hosts in a hostgroup.
+
 ### Proxy related:
 - `zhproxyfinder.py` -	Finds configured proxy for a Zabbix host.
 
@@ -79,6 +82,12 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 
 ```
 ./zhinvswitcher.py --all-hosts
+```
+
+##### Find all the hosts in the 'Customer A' hostgroup that match a name that starts with 'web'
+
+```
+./zghostfinder.py "Customer A" | grep -i '^web.*'
 ```
 
 ##### Using the zapi.py API client to test Zabbix API calls:
