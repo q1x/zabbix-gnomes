@@ -45,15 +45,18 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
  no_verify=true
 
 """)
+group = parser.add_mutually_exclusive_group(required=False)
+group2 = parser.add_mutually_exclusive_group(required=False)
 parser.add_argument('hostname', help='Hostname to find the configured triggers on')
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
 parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
-parser.add_argument('-n', '--numeric', help='Return numeric templateids instead of template names',action='store_true')
-parser.add_argument('-e', '--extended', help='Returns triggerid, trigger value, trigger status, trigger state, trigger severity and trigger description separated by ":". See https://www.zabbix.com/documentation/2.2/manual/api/reference/trigger/object for more information.',action='store_true')
-parser.add_argument('-s', '--search', help='Show only triggers with a description containing this search string')
+group.add_argument('-n', '--numeric', help='Return numeric triggerids instead of descriptions',action='store_true')
+group.add_argument('-e', '--extended', help='Returns triggerid, trigger value, trigger status, trigger state, trigger severity and trigger description separated by ":". See https://www.zabbix.com/documentation/2.2/manual/api/reference/trigger/object for more information.',action='store_true')
+group2.add_argument('-s', '--search', help='Show only triggers with a description containing this search string')
+group2.add_argument('-A', '--active', help='Show only active triggers',action='store_true')
 args = parser.parse_args()
 
 # load config module
@@ -124,6 +127,8 @@ if hosts:
    # Find linked templates
    if args.search:
       triggers = zapi.trigger.get(filter={'host':host_name},output='extend',search={'description':args.search},expandExpression=1,expandDescription=1)
+   elif args.active:
+      triggers = zapi.trigger.get(filter={'host':host_name,'value':1},output='extend',expandExpression=1,expandDescription=1)
    else:
       triggers = zapi.trigger.get(filter={'host':host_name},output='extend',expandExpression=1,expandDescription=1)
 
@@ -142,7 +147,7 @@ if hosts:
 	   for trigger in triggers:
 	     print(format(trigger["description"]))
    else:
-       sys.exit("Error: No triggers configured on "+ host_name)
+       sys.exit("Error: No matching triggers found on "+ host_name)
 else:
    sys.exit("Error: Could not find host "+ host_name)
 
