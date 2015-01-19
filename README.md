@@ -23,6 +23,10 @@ All of these tools can be invoked with `-h/--help` to get help.
 - `zthostfinder.py` - 	Finds hosts that are linked to a template.
 - `zthtmllinker.py` - 	Links host(group)s to a list of templates.
 
+### Trigger related:
+- `zhtrigfinder.py` -   Finds triggers on a host.
+- `ztrigswitcher.py`-   Switches a trigger to enabled or discabled status.
+
 ### Inv related:
 - `zhinvswitcher.py`- 	Switches inv. mode on host(group)s.
 
