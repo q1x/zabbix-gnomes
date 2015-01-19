@@ -82,6 +82,11 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 ./ztrigswitcher.py -D $(./zhtrigfinder.py -s "Unavailable by ICMP" -n "Google DNS")
 ```
 
+#### Count the number of active triggers on the host 'Webserver'
+
+```
+./zhtrigfinder.py -A "Webserver" | wc -l
+```
 
 ##### Switch the inventory mode to manual for all the hosts in a hostgroup
 
