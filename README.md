@@ -76,6 +76,13 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 ./zhtmpllinker.py -t "Template App Apache" "Template App MySQL" "Template OS Linux" -G "LAMP Servers"
 ```
 
+#### Disable the 'Unavailable by ICMP' trigger on the host named 'Google DNS'
+
+```
+./ztrigswitcher.py -D $(./zhtrigfinder.py -s "Unavailable by ICMP" -n "Google DNS")
+```
+
+
 ##### Switch the inventory mode to manual for all the hosts in a hostgroup
 
 ```
