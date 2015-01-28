@@ -22,6 +22,7 @@ All of these tools can be invoked with `-h/--help` to get help.
 - `zhtmplfinder.py` - 	Finds linked templates for a Zabbix host.
 - `zthostfinder.py` - 	Finds hosts that are linked to a template.
 - `zthtmllinker.py` - 	Links host(group)s to a list of templates.
+- `zthtmlunlink.py` - 	Unlinks host(group)s from a list of templates.
 
 ### Trigger related:
 - `zhtrigfinder.py` -   Finds triggers on a host.
@@ -75,6 +76,14 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 ```
 ./zhtmpllinker.py -t "Template App Apache" "Template App MySQL" "Template OS Linux" -G "LAMP Servers"
 ```
+
+
+##### Using zhtmplunlink.py to unlink a template from all the hosts in a hostgroup:
+
+```
+./zhtmplunlink.py -G "Webservers" -t "Template App MySQL"
+```
+
 
 #### Disable the 'Unavailable by ICMP' trigger on the host named 'Google DNS'
 
