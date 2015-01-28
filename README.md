@@ -8,6 +8,12 @@ All of these tools can be invoked with `-h/--help` to get help.
 ### API tools:
 - `zapi.py` -		Interactive Zabbix API client.
 
+### History related:
+- `zgethistory.py` -	Gets values from history for an itemid.
+
+### Inv related:
+- `zhinvswitcher.py`- 	Switches inv. mode on host(group)s.
+
 ### Graph related:
 - `zhgraphfinder.py` - 	Finds graphs configured on a Zabbix host.
 - `zgetgraph.py` - 	Downloads a graph .PNG from the Zabbix frontend and saves it.
@@ -28,8 +34,6 @@ All of these tools can be invoked with `-h/--help` to get help.
 - `zhtrigfinder.py` -   Finds triggers on a host.
 - `ztrigswitcher.py`-   Switches a trigger to enabled or discabled status.
 
-### Inv related:
-- `zhinvswitcher.py`- 	Switches inv. mode on host(group)s.
 
 Configuration
 -------------
@@ -82,6 +86,18 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 
 ```
 ./zhtmplunlink.py -G "Webservers" -t "Template App MySQL"
+```
+
+#### Get the latest item value from history for the item with itemid 1001
+
+```
+./zgethistory.py 1001 -C 1
+```
+
+#### Get a list of item values with timestamps and unit from history for a period of 2hr from Jan 1st 2014 00:00hr
+
+```
+./zgethistory.py -s $(date --date 'jan 1 2014' +%s) -t 7200 -e 1030
 ```
 
 
