@@ -12,11 +12,15 @@ All of these tools can be invoked with `-h/--help` to get help.
 - `zgethistory.py` -	Gets values from history for an itemid.
 
 ### Inv related:
-- `zhinvswitcher.py`- 	Switches inv. mode on host(group)s.
+- `zhinvswitcher.py` - 	Switches inv. mode on host(group)s.
+
+### Item related:
+- `zhitemfinder.py` -	Finds items on a host.	
+- `zgethistory.py` - 	Get item values from history (Trends are not supported!).
 
 ### Graph related:
 - `zhgraphfinder.py` - 	Finds graphs configured on a Zabbix host.
-- `zgetgraph.py` - 	Downloads a graph .PNG from the Zabbix frontend and saves it.
+- `zgetgraph.py` - 	Downloads a graph .PNG from the Zabbix frontend (needs user frontend access) and saves it.
 
 ### Group related:
 - `zghostfinder.py` -	Finds member hosts in a hostgroup.
@@ -129,6 +133,11 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 
 ```
 ./zghostfinder.py "Customer A" | grep -i '^web.*'
+```
+
+##### Print the last know value for the available memory in Bytes on the host 'Webserver' 
+```
+./zgethistory.py -C 1 $(./zhitemfinder.py -k 'vm.memory.size[available]' -n Webserver)
 ```
 
 ##### Using the zapi.py API client to test Zabbix API calls:
