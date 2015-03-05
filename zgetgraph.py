@@ -34,7 +34,10 @@ def ConfigSectionMap(section):
 
 
 # set default vars
-defconf = os.getenv("HOME") + "/.zbx.conf"
+try:
+ defconf = os.getenv("HOME") + "/.zbx.conf"
+except:
+ defconf = None
 username = ""
 password = ""
 api = ""
