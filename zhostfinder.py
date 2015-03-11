@@ -135,8 +135,7 @@ if search_name:
   	 for host in hosts:
              print(format(host["host"]))
     else:
-       sys.exit("Error: No hosts to find")
+       sys.exit("Error: Could not find any hosts matching \""+ search_name + "\"")
 else:
-   sys.exit("Error: Could not find any hosts matching \""+ search_name + "\"")
-
+   sys.exit("Error: No hosts to find")
 # And we're done...
