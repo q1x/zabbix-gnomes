@@ -53,6 +53,7 @@ parser.add_argument('--no-verify', help='Disables certificate validation when us
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
 parser.add_argument('-n', '--numeric', help='Return numeric hostids instead of host name',action='store_true')
 parser.add_argument('-e', '--extended', help='Return both hostids and host names separated with a ":"',action='store_true')
+parser.add_argument('-m', '--monitored', help='Only return hosts that are being monitored', action='store_true')
 args = parser.parse_args()
 
 # load config module
@@ -121,7 +122,10 @@ group = zapi.hostgroup.get(output="extend", filter=({'name': group_name}))
 if group: 
     groupid = group[0]["groupid"]
     # Find linked hosts
-    hosts = zapi.host.get(output="extend", groupids=groupid) 
+    if args.monitored:
+       hosts = zapi.host.get(output="extend", monitored_hosts=True, groupids=groupid) 
+    else:
+       hosts = zapi.host.get(output="extend", groupids=groupid) 
     if hosts:
       if args.extended:
         # print ids and names
