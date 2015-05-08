@@ -34,7 +34,7 @@ api = ""
 noverify = ""
 
 # Define commandline arguments
-parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Tries to find member hosts of a Zabbix hostgroup.', epilog="""
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Tries to find a list of hosts in Zabbix matching a search string.', epilog="""
 This program can use .ini style configuration files to retrieve the needed API connection information.
 To use this type of storage, create a conf file (the default is $HOME/.zbx.conf) that contains at least the [Zabbix API] section and any of the other parameters:
        
@@ -45,7 +45,7 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
  no_verify=true
 
 """)
-parser.add_argument('host', help='Host to find in zabbix')
+parser.add_argument('host', help='Hostname string to find in zabbix')
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
@@ -53,6 +53,7 @@ parser.add_argument('--no-verify', help='Disables certificate validation when us
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
 parser.add_argument('-n', '--numeric', help='Return numeric hostids instead of host name',action='store_true')
 parser.add_argument('-e', '--extended', help='Return both hostids and host names separated with a ":"',action='store_true')
+parser.add_argument('-m', '--monitored', help='Only return hosts that are being monitored', action='store_true')
 args = parser.parse_args()
 
 # load config module
@@ -119,7 +120,10 @@ search_name = args.host
 
 if search_name: 
     # Find matching hosts
-    hosts = zapi.host.get(output="extend", search={"host":search_name}) 
+    if args.monitored:
+      hosts = zapi.host.get(output="extend", monitored_hosts=True, search={"host":search_name}) 
+    else:
+      hosts = zapi.host.get(output="extend", search={"host":search_name})
     if hosts:
       if args.extended:
         # print ids and names
