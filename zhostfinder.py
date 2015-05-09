@@ -45,7 +45,9 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
  no_verify=true
 
 """)
-parser.add_argument('host', help='Hostname string to find in zabbix')
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('-S', '--search', help='Hostname string to find in Zabbix')
+group.add_argument('-A', '--all', help='Returns all hosts Zabbix',action='store_true')
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
@@ -116,7 +118,7 @@ zapi.login(username, password)
 ##################################
 
 # Find the hostgroup we are looking for
-search_name = args.host
+search_name = args.search
 
 if search_name: 
     # Find matching hosts
@@ -124,22 +126,30 @@ if search_name:
       hosts = zapi.host.get(output="extend", monitored_hosts=True, search={"host":search_name}) 
     else:
       hosts = zapi.host.get(output="extend", search={"host":search_name})
-    if hosts:
-      if args.extended:
-        # print ids and names
-        for host in hosts:
-          print(format(host["hostid"])+":"+format(host["host"]))
-      else:
-        if args.numeric:
-           # print host ids
-  	 for host in hosts:
-  	   print(format(host["hostid"]))
-        else:
-           # print host names
-  	 for host in hosts:
-             print(format(host["host"]))
+elif args.all:
+    # Find matching hosts
+    if args.monitored:
+      hosts = zapi.host.get(output="extend", monitored_hosts=True)
     else:
-       sys.exit("Error: Could not find any hosts matching \""+ search_name + "\"")
+      hosts = zapi.host.get(output="extend")
 else:
    sys.exit("Error: No hosts to find")
+
+if hosts:
+  if args.extended:
+     # print ids and names
+     for host in hosts:
+         print(format(host["hostid"])+":"+format(host["host"]))
+  else:
+     if args.numeric:
+         # print host ids
+         for host in hosts:
+             print(format(host["hostid"]))
+     else:
+         # print host names
+  	 for host in hosts:
+             print(format(host["host"]))
+else:
+  sys.exit("Error: Could not find any hosts matching \""+ search_name + "\"")
+
 # And we're done...
