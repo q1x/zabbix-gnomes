@@ -45,16 +45,18 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
  no_verify=true
 
 """)
+group = parser.add_mutually_exclusive_group()
 parser.add_argument('host', help='Host to update in zabbix')
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
 parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
-#parser.add_argument('-n', '--numeric', help='Return numeric hostids instead of host name',action='store_true')
 parser.add_argument('-N', '--name', help='Update hostname')
-args = parser.parse_args()
+group.add_argument('-V', '--visible-name', help='Update visible name')
+group.add_argument('-S', '--sync-names', help='Sets Hostname and visible name to the name specified with -N',action='store_true')
 
+args = parser.parse_args()
 # load config module
 Config = ConfigParser.ConfigParser()
 Config
@@ -121,24 +123,26 @@ if host_name:
     # Find matching hosts
     hosts = zapi.host.get(output="extend", filter={"host":host_name}) 
     if hosts:
-#      if args.extended:
-#        # print ids and names
-#        for host in hosts:
-#          print(format(host["hostid"])+":"+format(host["host"]))
-#      else:
-#       if args.numeric:
-#           # print host ids
-#         for host in hosts:
-# 	   print(format(host["hostid"]))
-#       else:
-#           # print host names
-#  	 for host in hosts:
-#             print(format(host["host"]))
-      if args.name:
-         result=zapi.host.update(hostid=hosts[0]["hostid"], host=args.name, name=args.name)
-         if result['hostids'][0] != hosts[0]["hostid"]:
-	   sys.exit("Error: Host \""+ host_name + "\" could not be updated with new name \"" + args.name +"\"")  
- 
+      if args.sync_names:
+         if not args.name:
+            sys.exit("Error: No name specified")
+
+         elif args.name:
+            result=zapi.host.update(hostid=hosts[0]["hostid"], host=args.name, name=args.name)
+            if result['hostids'][0] != hosts[0]["hostid"]:
+	       sys.exit("Error: Host \""+ host_name + "\" could not be updated with new name \"" + args.name +"\"")  
+         else:
+            sys.exit("Error: Something went wrong")
+
+      else:
+          if args.name:
+             result=zapi.host.update(hostid=hosts[0]["hostid"], host=args.name)
+             if result['hostids'][0] != hosts[0]["hostid"]:
+                sys.exit("Error: Host \""+ host_name + "\" could not be updated with new host name \"" + args.name +"\"")
+          if args.visible_name:
+             result=zapi.host.update(hostid=hosts[0]["hostid"], name=args.visible_name)
+             if result['hostids'][0] != hosts[0]["hostid"]:
+                sys.exit("Error: Host \""+ host_name + "\" could not be updated with new visible name \"" + args.name +"\"")
     else:
        sys.exit("Error: Could not find host \""+ host_name + "\"")
 else:

@@ -9,7 +9,7 @@ import os
 import os.path
 import sys
 import distutils.util
-import csv
+import csv, codecs, cStringIO
 from pyzabbix import ZabbixAPI
 
 # define config helper function
@@ -25,6 +25,65 @@ def ConfigSectionMap(section):
 		print("exception on %s!" % option)
 		dict1[option] = None
     return dict1
+
+class UTF8Recoder:
+    """
+    Iterator that reads an encoded stream and reencodes the input to UTF-8
+    """
+    def __init__(self, f, encoding):
+        self.reader = codecs.getreader(encoding)(f)
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        return self.reader.next().encode("utf-8")
+
+class UnicodeReader:
+    """
+    A CSV reader which will iterate over lines in the CSV file "f",
+    which is encoded in the given encoding.
+    """
+
+    def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
+        f = UTF8Recoder(f, encoding)
+        self.reader = csv.reader(f, dialect=dialect, **kwds)
+
+    def next(self):
+        row = self.reader.next()
+        return [unicode(s, "utf-8") for s in row]
+
+    def __iter__(self):
+        return self
+
+class UnicodeWriter:
+    """
+    A CSV writer which will write rows to CSV file "f",
+    which is encoded in the given encoding.
+    """
+
+    def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
+        # Redirect output to a queue
+        self.queue = cStringIO.StringIO()
+        self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
+        self.stream = f
+        self.encoder = codecs.getincrementalencoder(encoding)()
+
+    def writerow(self, row):
+        self.writer.writerow([s.encode("utf-8") for s in row])
+        # Fetch UTF-8 output from the queue ...
+        data = self.queue.getvalue()
+        data = data.decode("utf-8")
+        # ... and reencode it into the target encoding
+        data = self.encoder.encode(data)
+        # write to the target stream
+        self.stream.write(data)
+        # empty queue
+        self.queue.truncate(0)
+
+    def writerows(self, rows):
+        for row in rows:
+            self.writerow(row)
 
 
 # set default vars
@@ -212,7 +271,6 @@ elif args.fields:
     for qfield in args.fields:
        qfields.append(qfield)
     result=zapi.host.get(output=['host','hostid'],hostids=hostids,selectInventory=qfields)
-
 else:
     #uhm... what were we supposed to do?
     sys.exit("Error: Nothing to do here")
@@ -221,14 +279,19 @@ if result:
    header=["id","host"]
 
    # Find returned fieldnames
-   fieldnames=[]
-   for fieldname in result[0]['inventory']:
-      if fieldname != 'hostid':
+   try:
+     if qfields:
+        fieldnames=qfields
+   except:
+     fieldnames=[]
+     for fieldname in result[0]['inventory']:
+       if fieldname != 'hostid':
          fieldnames.append(fieldname)
-         header.append(fieldname) 
+   for fieldname in fieldnames:
+      header.append(fieldname) 
 
    # Output the result in CSV format 
-   output = csv.writer(sys.stdout, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+   output = UnicodeWriter(sys.stdout, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
    output.writerow(header)
    for host in result:
       row=[host['hostid'],host['host']]

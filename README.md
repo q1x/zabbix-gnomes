@@ -13,6 +13,7 @@ All of these tools can be invoked with `-h/--help` to get help.
 
 ### Inv related:
 - `zhinvswitcher.py` - 	Switches inv. mode on host(group)s.
+- `zgetinventory.py` -  Prints host inventory in CSV format
 
 ### Item related:
 - `zhitemfinder.py` -	Finds items on a host.	
@@ -24,6 +25,10 @@ All of these tools can be invoked with `-h/--help` to get help.
 
 ### Group related:
 - `zghostfinder.py` -	Finds member hosts in a hostgroup.
+
+### Host related:
+- `zhostfinder.py`  -   Finds hosts in Zabbix based on search string.
+- `zhostupdater.py` -   Updates hosts properties.
 
 ### Proxy related:
 - `zhproxyfinder.py` -	Finds configured proxy for a Zabbix host.
@@ -38,6 +43,8 @@ All of these tools can be invoked with `-h/--help` to get help.
 - `zhtrigfinder.py` -   Finds triggers on a host.
 - `ztrigswitcher.py`-   Switches a trigger to enabled or discabled status.
 
+### Event related:
+- `zeventacker.py` - Acknowledges an event.
 
 Configuration
 -------------
@@ -85,7 +92,6 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 ./zhtmpllinker.py -t "Template App Apache" "Template App MySQL" "Template OS Linux" -G "LAMP Servers"
 ```
 
-
 ##### Using zhtmplunlink.py to unlink a template from all the hosts in a hostgroup:
 
 ```
@@ -103,7 +109,6 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 ```
 ./zgethistory.py -s $(date --date 'jan 1 2014' +%s) -t 7200 -e 1030
 ```
-
 
 #### Disable the 'Unavailable by ICMP' trigger on the host named 'Google DNS'
 
@@ -135,9 +140,29 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 ./zghostfinder.py "Customer A" | grep -i '^web.*'
 ```
 
-##### Print the last know value for the available memory in Bytes on the host 'Webserver' 
+##### Print the last known value for the available memory in Bytes on the host 'Webserver' 
 ```
 ./zgethistory.py -C 1 $(./zhitemfinder.py -k 'vm.memory.size[available]' -n Webserver)
+```
+
+##### Perform a search for all monitored hosts matching the hostname string 'zabbix'
+```
+./zhostfinder.py -m -S zabbix
+```
+
+##### Output a CSV with hostid, hostname, OS, vendor and contact fields for all hosts in the 'Zabbix Servers' group
+```
+./zgetinventory.py -G "Zabbix Servers" -F "os" "vendor" "contact"
+```
+
+##### Update the visible name of the host web001 to 'primary webserver'
+```
+./zhostupdater.py web001 -V 'primary webserver'
+```
+
+### Acknowledge 3 events with the message "Power outage"
+```
+./zeventacker.py -m "Power outage" 6578 6689 6590
 ```
 
 ##### Using the zapi.py API client to test Zabbix API calls:
