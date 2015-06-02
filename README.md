@@ -152,7 +152,7 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 
 ##### Output a CSV with hostid, hostname, OS, vendor and contact fields for all hosts in the 'Zabbix Servers' group
 ```
-./zgetinventory.py -G "Zabbix Servers" -F "os" "vendor" "contact"
+./zgetinventory.py -G "Zabbix Servers" -F "os" "vendor" "contact" > report.csv
 ```
 
 ##### Update the visible name of the host web001 to 'primary webserver'
