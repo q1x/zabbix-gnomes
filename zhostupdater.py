@@ -133,7 +133,6 @@ if host_name:
             call["name"]=args.visible_name
     else:
        sys.exit("Error: Could not find host \""+ host_name + "\"")
-    print(format(call))
     result=zapi.host.update(call)
     if result['hostids'][0] != hosts[0]["hostid"]:
        sys.exit("Error: Host \""+ host_name + "\" could not be updated")
