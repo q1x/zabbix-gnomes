@@ -128,7 +128,7 @@ if hosts:
    if args.search:
       triggers = zapi.trigger.get(filter={'host':host_name},output='extend',search={'description':args.search},expandExpression=1,expandDescription=1)
    elif args.active:
-      triggers = zapi.trigger.get(filter={'host':host_name,'value':1},output='extend',expandExpression=1,expandDescription=1)
+      triggers = zapi.trigger.get(filter={'host':host_name,'value':1},output='extend',monitored=1,active=1,expandExpression=1,expandDescription=1)
    else:
       triggers = zapi.trigger.get(filter={'host':host_name},output='extend',expandExpression=1,expandDescription=1)
 
