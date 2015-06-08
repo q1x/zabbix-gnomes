@@ -13,7 +13,8 @@ All of these tools can be invoked with `-h/--help` to get help.
 
 ### Inv related:
 - `zhinvswitcher.py` - 	Switches inv. mode on host(group)s.
-- `zgetinventory.py` -  Prints host inventory in CSV format
+- `zgetinventory.py` -  Prints host inventory in CSV format.
+- `zhostupdater.py` - Updates host properties.
 
 ### Item related:
 - `zhitemfinder.py` -	Finds items on a host.	
@@ -42,6 +43,9 @@ All of these tools can be invoked with `-h/--help` to get help.
 ### Trigger related:
 - `zhtrigfinder.py` -   Finds triggers on a host.
 - `ztrigswitcher.py`-   Switches a trigger to enabled or discabled status.
+
+### Macro related:
+- `zhostupdater.py` - Updates host properties.
 
 ### Event related:
 - `zeventacker.py` - Acknowledges an event.
@@ -158,6 +162,11 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 ##### Update the visible name of the host web001 to 'primary webserver'
 ```
 ./zhostupdater.py web001 -V 'primary webserver'
+```
+
+##### Enable the host web001, apply the macro {$APACHEPROC} and update the 'Sofware Application A' inv field
+```
+./zhostupdater.py web001 -E -M apacheproc=15 -I software_app_a="Apache"
 ```
 
 ### Acknowledge 3 events with the message "Power outage"
