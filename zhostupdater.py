@@ -56,7 +56,7 @@ parser.add_argument('--no-verify', help='Disables certificate validation when us
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
 parser.add_argument('-N', '--name', help='Update hostname')
 group.add_argument('-V', '--visible-name', help='Update visible name')
-group.add_argument('-S', '--sync-names', help='Sets Hostname and visible name to the name specified with -N',action='store_true')
+group.add_argument('-S', '--sync-names', help='Sets hostname and visible name to the name specified with -N',action='store_true')
 parser.add_argument('-I', '--inventory', help='Update inventory fields. Specify each field as \'fieldnmame="value"\'.', nargs='+')
 group2.add_argument('-M', '--macros', help='Update or add macros. Specify each field as \'"macro"="value"\'. Don\'t add {$...} characters, this script will handle that for you.', nargs='+')
 group2.add_argument('-R', '--remove-macros', help='Remove macros. Don\'t add {$...} characters, this script will handle that for you.', nargs='+')
