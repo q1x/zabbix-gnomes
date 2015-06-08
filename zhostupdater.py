@@ -46,6 +46,8 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
 
 """)
 group = parser.add_mutually_exclusive_group()
+group2 = parser.add_mutually_exclusive_group()
+group3 = parser.add_mutually_exclusive_group()
 parser.add_argument('host', help='Host to update in zabbix')
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
@@ -55,6 +57,11 @@ parser.add_argument('-c','--config', help='Config file location (defaults to $HO
 parser.add_argument('-N', '--name', help='Update hostname')
 group.add_argument('-V', '--visible-name', help='Update visible name')
 group.add_argument('-S', '--sync-names', help='Sets Hostname and visible name to the name specified with -N',action='store_true')
+parser.add_argument('-I', '--inventory', help='Update inventory fields. Specify each field as \'fieldnmame="value"\'.', nargs='+')
+group2.add_argument('-M', '--macros', help='Update or add macros. Specify each field as \'"macro"="value"\'. Don\'t add {$...} characters, this script will handle that for you.', nargs='+')
+group2.add_argument('-R', '--remove-macros', help='Remove macros. Don\'t add {$...} characters, this script will handle that for you.', nargs='+')
+group3.add_argument('-E', '--enable', help='Set the host to \'Monitored\'',action='store_true')
+group3.add_argument('-D', '--disable', help='Set the host to \'Not monitored\'',action='store_true')
 
 args = parser.parse_args()
 # load config module
@@ -118,22 +125,101 @@ zapi.login(username, password)
 
 # Find the host we are looking for
 host_name = args.host
+
+# setup call dict
 call={}
 
 if host_name: 
     # Find matching hosts
-    hosts = zapi.host.get(output="extend", filter={"host":host_name}) 
+    hosts = zapi.host.get(output="extend", selectMacros="extend", filter={"host":host_name}) 
     if hosts: 
+      # Basic API call params
       call["hostid"]=hosts[0]["hostid"]
+      # Current raw list of macros for the host
+      curmac=hosts[0]["macros"]
+
+      # Set names if specified
       if args.name:
        	 call["host"]=args.name
          if args.sync_names:
             call["name"]=args.name
          elif args.visible_name:
             call["name"]=args.visible_name
+      
+      # update inventory fields
+      if args.inventory:
+	zbxinv={}
+	for field in args.inventory:
+	    if '=' in field:
+               field=field.split('=')
+               zbxinv[field[0]]=field[1]
+            else:
+               sys.exit("Error: Inventory \""+ field + "\" is not valid")
+        call["inventory"]=zbxinv 
+
+      # update or add macros
+      if args.macros:
+	zbxmac=[]
+	for field in args.macros:
+	    if '=' in field:
+               # Create macro object with proper value
+               field=field.split('=')
+	       name=unicode("{$" + field[0].upper() + "}")
+               value=unicode(field[1])
+               macro={"macro":name,"value":value}
+               zbxmac.append(macro)
+            else:
+               sys.exit("Error: Macro \""+ field + "\" is not valid")
+
+        # Itterate over the current macros and append them to the list, unless we just added an updated value
+        for line in curmac:
+            name=line['macro']
+            value=line['value']
+            macro={"macro":name,"value":value}
+            if not any(check.get('macro', None) == name for check in zbxmac): 
+               zbxmac.append(macro)
+
+      elif args.remove_macros:
+	zbxmac=[]
+        remmac=[]
+        # Create a list of macros to be removed
+	for field in args.remove_macros:
+               # find macro name
+	       name=unicode("{$" + field.upper() + "}")
+               macro={"macro":name}
+               remmac.append(macro)
+
+        # itterate over the current macros and append them to the list, unless the macro is listed in the macros to be removed
+        for line in curmac:
+            name=line['macro']
+            value=line['value']
+            macro={"macro":name,"value":value}
+            if not any(check.get('macro', None) == name for check in remmac): 
+               zbxmac.append(macro)
+
+      # Add macros to the API call if defined
+      try:
+	 if zbxmac:
+            call["macros"]=zbxmac 
+      except:
+         pass
+
+      # Set host status
+      if args.enable:
+         call["status"]=0
+      elif args.disable:
+         call["status"]=1
+
+
     else:
        sys.exit("Error: Could not find host \""+ host_name + "\"")
-    result=zapi.host.update(call)
+
+    # Perform API call
+    try:
+      result=zapi.host.update(call)
+    except:
+      sys.exit("Error: Host \""+ host_name + "\" could not be updated")
+
     if result['hostids'][0] != hosts[0]["hostid"]:
        sys.exit("Error: Host \""+ host_name + "\" could not be updated")
 
