@@ -118,33 +118,26 @@ zapi.login(username, password)
 
 # Find the host we are looking for
 host_name = args.host
+call={}
 
 if host_name: 
     # Find matching hosts
     hosts = zapi.host.get(output="extend", filter={"host":host_name}) 
-    if hosts:
-      if args.sync_names:
-         if not args.name:
-            sys.exit("Error: No name specified")
-
-         elif args.name:
-            result=zapi.host.update(hostid=hosts[0]["hostid"], host=args.name, name=args.name)
-            if result['hostids'][0] != hosts[0]["hostid"]:
-	       sys.exit("Error: Host \""+ host_name + "\" could not be updated with new name \"" + args.name +"\"")  
-         else:
-            sys.exit("Error: Something went wrong")
-
-      else:
-          if args.name:
-             result=zapi.host.update(hostid=hosts[0]["hostid"], host=args.name)
-             if result['hostids'][0] != hosts[0]["hostid"]:
-                sys.exit("Error: Host \""+ host_name + "\" could not be updated with new host name \"" + args.name +"\"")
-          if args.visible_name:
-             result=zapi.host.update(hostid=hosts[0]["hostid"], name=args.visible_name)
-             if result['hostids'][0] != hosts[0]["hostid"]:
-                sys.exit("Error: Host \""+ host_name + "\" could not be updated with new visible name \"" + args.name +"\"")
+    if hosts: 
+      call["hostid"]=hosts[0]["hostid"]
+      if args.name:
+       	 call["host"]=args.name
+         if args.sync_names:
+            call["name"]=args.name
+         elif args.visible_name:
+            call["name"]=args.visible_name
     else:
        sys.exit("Error: Could not find host \""+ host_name + "\"")
+    print(format(call))
+    result=zapi.host.update(call)
+    if result['hostids'][0] != hosts[0]["hostid"]:
+       sys.exit("Error: Host \""+ host_name + "\" could not be updated")
+
 else:
    sys.exit("Error: No hosts to find")
 # And we're done...
