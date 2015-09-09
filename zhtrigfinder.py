@@ -54,7 +54,7 @@ parser.add_argument('-a', '--api', help='Zabbix API URL')
 parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
 group.add_argument('-n', '--numeric', help='Return numeric triggerids instead of descriptions',action='store_true')
-group.add_argument('-e', '--extended', help='Returns triggerid, trigger value, trigger status, trigger state, trigger severity and trigger description separated by ":". See https://www.zabbix.com/documentation/2.2/manual/api/reference/trigger/object for more information.',action='store_true')
+group.add_argument('-e', '--extended', help='Returns trigger id, value, status, state, severity, description and expression separated by ":". See https://www.zabbix.com/documentation/2.2/manual/api/reference/trigger/object for more information.',action='store_true')
 group2.add_argument('-s', '--search', help='Show only triggers with a description containing this search string')
 group2.add_argument('-A', '--active', help='Show only active triggers',action='store_true')
 args = parser.parse_args()
@@ -124,7 +124,7 @@ host_name = args.hostname
 hosts = zapi.host.get(output="extend", filter={"host": host_name})
 
 if hosts:
-   # Find linked templates
+   # Find triggers
    if args.search:
       triggers = zapi.trigger.get(filter={'host':host_name},output='extend',search={'description':args.search},expandExpression=1,expandDescription=1)
    elif args.active:
@@ -136,7 +136,7 @@ if hosts:
       if args.extended:
          # print ids and descriptions
 	 for trigger in triggers:
-	   print(format(trigger["triggerid"])+":"+format(trigger["value"])+":"+format(trigger["status"])+":"+format(trigger["state"])+":"+format(trigger["priority"])+":"+format(trigger["description"]))
+	   print(format(trigger["triggerid"])+":"+format(trigger["value"])+":"+format(trigger["status"])+":"+format(trigger["state"])+":"+format(trigger["priority"])+":"+format(trigger["description"])+":"+format(trigger["expression"]))
       else:
         if args.numeric:
            # print ids
