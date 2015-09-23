@@ -110,6 +110,7 @@ group = parser.add_mutually_exclusive_group(required=True)
 group2 = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('-H', '--hostnames' ,help='Hostname(s) to find inventory data for', nargs='+')
 group.add_argument('-G', '--hostgroups' ,help='Switch inventory mode on all hosts in these hostgroup(s)', nargs='+')
+group.add_argument('--all-hosts', help='Switch inventory mode on *ALL* hosts, use with caution',action='store_true')
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
@@ -182,7 +183,11 @@ zapi.login(username, password)
 # Start actual API logic
 ##################################
 
-if args.hostgroups:
+if args.all_hosts:
+       # Make a list of all hosts
+       hlookup = zapi.host.get()
+else:
+  if args.hostgroups:
     if args.numeric:
        # We are getting numeric hostgroup ID's, let put them in a list
        # (ignore any non digit items)
@@ -216,7 +221,7 @@ if args.hostgroups:
        else:
            hlookup=zapi.host.get(output=['hostid'],groupids=hgids)
 
-elif args.hostnames:
+  elif args.hostnames:
     if args.numeric:
        # We are getting numeric host ID's, let put them in a list
        # (ignore any non digit items)
@@ -248,12 +253,13 @@ elif args.hostnames:
            else:
                hlookup=zapi.host.get(output=['hostid'],filter=({'host':args.hostnames}))
 
-else:
-    #uhm... what were we supposed to do?
-    sys.exit("Error: Nothing to do here")
+  else:
+     #uhm... what were we supposed to do?
+     sys.exit("Error: Nothing to do here")
   
 if not hlookup:
-   sys.exit("Error: No hosts found")
+     sys.exit("Error: No hosts found")
+
 
 # Convert hlookup to a usable parameter for host.get
 hostids=[]
@@ -289,6 +295,8 @@ if result:
          fieldnames.append(fieldname)
    for fieldname in fieldnames:
       header.append(fieldname) 
+
+   print(format(fieldnames))
 
    # Output the result in CSV format 
    output = UnicodeWriter(sys.stdout, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
