@@ -296,8 +296,6 @@ if result:
    for fieldname in fieldnames:
       header.append(fieldname) 
 
-   print(format(fieldnames))
-
    # Output the result in CSV format 
    output = UnicodeWriter(sys.stdout, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
    output.writerow(header)
