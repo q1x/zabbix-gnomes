@@ -265,7 +265,7 @@ if host_name:
 
     # Perform API call
     try:
-            result=zapi.host.update(call)
+            result=zapi.host.update(**call)
     except:
             sys.exit("Error: Host \""+ host_name + "\" could not be updated")
 
