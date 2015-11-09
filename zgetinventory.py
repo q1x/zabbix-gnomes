@@ -302,7 +302,10 @@ if result:
    for host in result:
       row=[host['hostid'],host['host']]
       for field in fieldnames:
-          row.append(host['inventory'][field])
+          if len(host['inventory'])>0:    
+            row.append(host['inventory'][field])
+          else: 
+            row.append("")
       output.writerow(row)
    sys.stdout.close()
 else:
