@@ -176,7 +176,7 @@ zapi.login(username, password)
 ##################################
 
 # Base API call
-call={'sortfield': 'clock', 'sortorder': 'ASC', 'output': 'extend', 'source': 0}
+call={'sortfield': 'clock', 'sortorder': 'DESC', 'output': 'extend', 'source': 0}
 call['limit']=args.limit
 
 if args.ids:
@@ -197,12 +197,12 @@ if args.ack:
 if args.start_time:
         call['time_from']=args.start_time
 
-
 if args.time_period:
         if args.start_time:
             call['time_till']=args.start_time+args.time_period
         else:
             call['time_from']=int(time.time())-args.time_period
+
 
 if args.hostgroups:
     if args.numeric:
@@ -258,13 +258,13 @@ try:
         events=zapi.event.get(**call)
         if events:
                 if args.ids:
-                        for event in events:
+                        for event in sorted(events):
                             eventid=event['eventid']    
                             print(eventid)            
                 else:
                     triggerids=[event['objectid'] for event in events]
                     triggers=zapi.trigger.get(triggerids=triggerids,output='extend',expandData=1,expandDescription=1,preservekeys=1,expandComment=1)
-                    for event in events:
+                    for event in sorted(events):
                         eventid=event['eventid']
                         etime=timestr(event['clock'])
                         hostname="<Unknown Host>"
