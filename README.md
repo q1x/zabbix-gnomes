@@ -191,6 +191,11 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 ./zeventacker.py -m 'Foobar with Fabric :-(' $(./zeventfinder.py -i -P -t 900 -G 'Linux servers') 
 ```
 
+### Follow Zabbix trigger events for all hosts
+```
+./zeventfinder.py -L 10 --all-hosts -f
+```
+
 ##### Using the zapi.py API client to test Zabbix API calls:
 
 ```
