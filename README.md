@@ -171,27 +171,27 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 ./zhostupdater.py web001 -E -M apacheproc=15 -I software_app_a="Apache"
 ```
 
-### Find all PROBLEM events during the last hour for the the hosts in the group 'Linux Servers' (Limited to 100 events)
+##### Find all PROBLEM events during the last hour for the the hosts in the group 'Linux Servers' (Limited to 100 events)
 ```
 ./zeventfinder.py -P -t 3600 -G 'Linux Servers' 
 ```
 
-### Acknowledge 3 events with the message "Power outage"
+##### Acknowledge 3 events with the message "Power outage"
 ```
 ./zeventacker.py -m "Power outage" 6578 6689 6590
 ```
 
-### Print details on 3 events including trigger comments, actions and acknowledgements 
+##### Print details on 3 events including trigger comments, actions and acknowledgements 
 ```
 ./zgetevent.py -ACL 6578 6689 6590 
 ```
 
-### Acknowledge all PROBLEM events in the last 15 minutes for the hosts in the 'Linux Serves' group
+##### Acknowledge all PROBLEM events in the last 15 minutes for the hosts in the 'Linux Serves' group
 ```
 ./zeventacker.py -m 'Foobar with Fabric :-(' $(./zeventfinder.py -i -P -t 900 -G 'Linux servers') 
 ```
 
-### Follow Zabbix trigger events for all hosts
+##### Follow Zabbix trigger events for all hosts
 ```
 ./zeventfinder.py -L 10 --all-hosts -f
 ```
