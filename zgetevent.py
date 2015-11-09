@@ -30,7 +30,7 @@ def ConfigSectionMap(section):
 # conversion of timestamp
 def timestr(timestamp):
     if timestamp.isdigit:
-            time=datetime.utcfromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S')
+            time=datetime.utcfromtimestamp(int(timestamp)).strftime('%Y-%m-%d %H:%M:%S (UTC)')
             return time
 
 # Zabbix severity mapper
@@ -229,11 +229,19 @@ if events:
         for event in events:
                 eventid=event['eventid']
                 time=timestr(event['clock'])
-                hostname=triggers[event['objectid']]['host']
-                trigger=triggers[event['objectid']]['description']
                 state=statusmap(event['value'])
                 acked=ackmap(event['acknowledged'])
-                severity=severitymap(triggers[event['objectid']]['priority'])
+                hostname="<Unknown Host>"
+                trigger="<Unknown Trigger>"
+                triggerid="<Unknown Triggerid>"
+                severity="<Unknown Severity>"
+                try:
+                    hostname=triggers[event['objectid']]['host']
+                    severity=severitymap(triggers[event['objectid']]['priority'])
+                    trigger=triggers[event['objectid']]['description']
+                    triggerid=event['objectid']
+                except:
+                    pass
                 if args.short:
                     if acked==True:
                             acknowledged="Ack: Yes"
@@ -252,6 +260,7 @@ if events:
                     blockprint("  Time     : ",time)
                     blockprint("  Host     : ",hostname)
                     blockprint("  Trigger  : ",trigger)
+                    blockprint("  TriggerID: ",triggerid)
                     blockprint("  Ack'ed   : ",acknowledged)
                     print
 
@@ -265,7 +274,7 @@ if events:
                     if args.acks:
                         print "  -- Acknowledges --"
                         acks=event['acknowledges']
-                        if len(acks)>1:
+                        if len(acks)>0:
                                 for ack in acks:
                                         user=ack['name'] + " " + ack['surname'] + " (" + ack['alias'] + ")"
                                         blockprint("  Time     : ",timestr(ack['clock']))
@@ -279,7 +288,7 @@ if events:
                     if args.alerts:
                         print "  -- Alert Actions --"
                         alerts=event['alerts']
-                        if len(alerts)>1:
+                        if len(alerts)>0:
                                 for alert in alerts:
                                         blockprint("  Step     : ",alert['esc_step'])
                                         blockprint("  Time     : ",timestr(alert['clock']))
