@@ -96,16 +96,17 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
 group = parser.add_mutually_exclusive_group(required=True)
 group2 = parser.add_mutually_exclusive_group(required=False)
 group3 = parser.add_mutually_exclusive_group(required=False)
-group.add_argument('-H', '--hostnames' ,help='Hostname(s) to find inventory data for', nargs='+')
-group.add_argument('-G', '--hostgroups' ,help='Switch inventory mode on all hosts in these hostgroup(s)', nargs='+')
-group.add_argument('--all-hosts', help='Switch inventory mode on *ALL* hosts, use with caution',action='store_true')
+group.add_argument('-H', '--hostnames' ,help='Hostname(s) to find events for', nargs='+')
+group.add_argument('-G', '--hostgroups' ,help='Hostgroup(s) to find events for', nargs='+')
+group.add_argument('-T', '--triggerids' ,help='Triggerid(s) to find events for', type=int, nargs='+')
+group.add_argument('--all-hosts', help='Find events for all hosts',action='store_true')
 parser.add_argument('-n', '--numeric', help='Use numeric ids instead of names, applies to -H and -G',action='store_true')
 parser.add_argument('-L', '--limit', help='Limit the number of returned lines, default is 100',default=100,type=int)
 group2.add_argument('-P', '--problem', help='Only show PROBLEM events', action='store_true')
 group2.add_argument('-O', '--ok', help='Only show OK events', action='store_true')
 parser.add_argument('-A', '--ack', help='Only show Acknowledged events', action='store_true')
 parser.add_argument('-t', '--time-period', help='Timeperiod in seconds (default is one week)', type=int, default=604800)
-group3.add_argument('-s', '--start-time', help='Unixtimestamp to search from', type=int)
+group3.add_argument('-s', '--start-time', help='Unix timestamp to search from', type=int)
 group3.add_argument('-f', '--follow', help='Follow events as they occur', action='store_true')
 parser.add_argument('-i', '--ids', help='Output only eventids',action='store_true')
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
@@ -253,6 +254,14 @@ elif args.hostnames:
         call['hostids']=hids
     else:
         sys.exit("Error: No hosts found")
+
+elif args.triggerids:
+    tids=[s for s in args.triggerids]
+    if len(tids)>0:
+        call['objectids']=tids
+    else:
+        sys.exit("Error: No triggers found")
+
 try:
     while True: 
         events=zapi.event.get(**call)
