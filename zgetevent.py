@@ -276,8 +276,10 @@ if events:
                         acks=event['acknowledges']
                         if len(acks)>0:
                                 for ack in acks:
+                                        print ack
                                         user=ack['name'] + " " + ack['surname'] + " (" + ack['alias'] + ")"
                                         blockprint("  Time     : ",timestr(ack['clock']))
+                                        blockprint("  AckID    : ",ack['acknowledgeid'])
                                         blockprint("  User     : ",user)
                                         blockprint("  Message  : ",ack['message'])
                                                                 
@@ -293,6 +295,7 @@ if events:
                                         blockprint("  Step     : ",alert['esc_step'])
                                         blockprint("  Time     : ",timestr(alert['clock']))
                                         blockprint("  Type     : ",alerttypemap(alert['alerttype']))
+                                        blockprint("  AlertID  : ",alert['alertid'])
                                         blockprint("  Status   : ",alertstatusmap(alert['status'],alert['alerttype']))
                                         if int(alert['alerttype'])==0:
                                                blockprint("  Sent to  : ",alert['sendto'])
