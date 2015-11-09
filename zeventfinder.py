@@ -104,7 +104,7 @@ parser.add_argument('-L', '--limit', help='Limit the number of returned lines, d
 group2.add_argument('-P', '--problem', help='Only show PROBLEM events', action='store_true')
 group2.add_argument('-O', '--ok', help='Only show OK events', action='store_true')
 parser.add_argument('-A', '--ack', help='Only show Acknowledged events', action='store_true')
-parser.add_argument('-t', '--time-period', help='Timeperiod in seconds', type=int)
+parser.add_argument('-t', '--time-period', help='Timeperiod in seconds (default is one week)', type=int, default=604800)
 group3.add_argument('-s', '--start-time', help='Unixtimestamp to search from', type=int)
 group3.add_argument('-f', '--follow', help='Follow events as they occur', action='store_true')
 parser.add_argument('-i', '--ids', help='Output only eventids',action='store_true')
@@ -176,7 +176,7 @@ zapi.login(username, password)
 ##################################
 
 # Base API call
-call={'sortfield': 'clock', 'sortorder': 'DESC', 'output': 'extend', 'source': 0}
+call={'sortfield': 'clock', 'sortorder': 'ASC', 'output': 'extend', 'source': 0}
 call['limit']=args.limit
 
 if args.ids:
@@ -196,6 +196,7 @@ if args.ack:
 
 if args.start_time:
         call['time_from']=args.start_time
+
 
 if args.time_period:
         if args.start_time:
@@ -257,13 +258,13 @@ try:
         events=zapi.event.get(**call)
         if events:
                 if args.ids:
-                        for event in sorted(events):
+                        for event in events:
                             eventid=event['eventid']    
                             print(eventid)            
                 else:
                     triggerids=[event['objectid'] for event in events]
                     triggers=zapi.trigger.get(triggerids=triggerids,output='extend',expandData=1,expandDescription=1,preservekeys=1,expandComment=1)
-                    for event in sorted(events):
+                    for event in events:
                         eventid=event['eventid']
                         etime=timestr(event['clock'])
                         hostname="<Unknown Host>"
