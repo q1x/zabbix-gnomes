@@ -292,6 +292,8 @@ try:
                         else:
                               acknowledged="Ack: No"
                         print "%s %s: %s [%s] %s (%s|%s)" % (etime, hostname, state, eventid, trigger, severity, acknowledged)
+                        if args.follow:
+                                sys.stdout.flush()
         if not args.follow and not events:
                 sys.exit("Error: No events found.")
     
