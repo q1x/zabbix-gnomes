@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
 # import needed modules.
 # pyzabbix is needed, see https://github.com/lukecyca/pyzabbix
@@ -35,17 +35,27 @@ def timestr(timestamp):
 
 # Zabbix severity mapper
 def severitymap(level):
-    level=int(level)    
+    level=int(level)
     if level<6:
             map=['Not Classified','Information','Warning','Average','High','Disaster']
-            return map[level]
+            color=['white','white','yellow','yellow','red','red']
+            try:
+                from termcolor import colored
+                return colored(map[level],color[level])
+            except:
+                return map[level]
 
 # Zabbix trigger status mapper
 def statusmap(status):
-    status=int(status)    
+    status=int(status)
     if status<2:
             map=['OK','PROBLEM']
-            return map[status]
+            color=['green','red']
+            try:
+                from termcolor import colored
+                return colored(map[status],color[status])
+            except:
+                return map[status]
 
 # Zabbix acknowledge status mapper
 def ackmap(acknowledged):
@@ -131,7 +141,7 @@ api = ""
 noverify = ""
 
 # Define commandline arguments
-parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Gets event details for Zabbix events.', epilog="""
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Gets event details for Zabbix events. If the termcolor module is found, it is used to generate colored output.', epilog="""
 This program can use .ini style configuration files to retrieve the needed API connection information.
 To use this type of storage, create a conf file (the default is $HOME/.zbx.conf) that contains at least the [Zabbix API] section and any of the other parameters:
        
