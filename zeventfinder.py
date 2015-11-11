@@ -278,11 +278,13 @@ try:
                         etime=timestr(event['clock'])
                         hostname="<Unknown Host>"
                         trigger="<Unknown Trigger>"
+                        triggerid="<Unknown Triggerid>"
                         severity="<Unknown Severity>"
                         try:
                             hostname=triggers[event['objectid']]['host']
                             trigger=triggers[event['objectid']]['description']
                             severity=severitymap(triggers[event['objectid']]['priority'])
+                            triggerid=event['objectid']
                         except:
                             pass
                         state=statusmap(event['value'])
@@ -291,7 +293,7 @@ try:
                               acknowledged="Ack: Yes"
                         else:
                               acknowledged="Ack: No"
-                        print "%s %s: %s [%s] %s (%s|%s)" % (etime, hostname, state, eventid, trigger, severity, acknowledged)
+                        print "%s %s: %s [%s] %s [%s](%s|%s)" % (etime, hostname, state, eventid, trigger, triggerid, severity, acknowledged)
                         if args.follow:
                                 sys.stdout.flush()
         if not args.follow and not events:

@@ -247,7 +247,7 @@ if events:
                             acknowledged="Ack: Yes"
                     else:
                             acknowledged="Ack: No"
-                    print "%s %s: %s [%s] %s (%s|%s)" % (time, hostname, state, eventid, trigger, severity, acknowledged)
+                    print "%s %s: %s [%s] %s [%s](%s|%s)" % (time, hostname, state, eventid, trigger, triggerid, severity, acknowledged)
                 else:
                     if acked==True:
                         acknowledged='Acknowledged'
