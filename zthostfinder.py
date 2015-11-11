@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # import needed modules.
 # pyzabbix is needed, see https://github.com/lukecyca/pyzabbix
@@ -53,6 +54,7 @@ parser.add_argument('--no-verify', help='Disables certificate validation when us
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
 parser.add_argument('-n', '--numeric', help='Return numeric hostids instead of host name',action='store_true')
 parser.add_argument('-e', '--extended', help='Return both hostids and host names separated with a ":"',action='store_true')
+parser.add_argument('-V', '--visible-name', help='Return visible name instead of technical name', action='store_true')
 args = parser.parse_args()
 
 # load config module
@@ -129,13 +131,16 @@ if templateid:
           print(format(host["hostid"])+":"+format(host["host"]))
       else:
         if args.numeric:
-           # print host ids
-  	 for host in hosts:
-  	   print(format(host["hostid"]))
+          # print host ids
+  	      for host in hosts:
+  	           print(format(host["hostid"]))
         else:
-           # print host names
-  	 for host in hosts:
-             print(format(host["host"]))
+          # print host names
+  	      for host in hosts:
+               if args.visible_name:
+                   print(format(host[u"name"].encode('utf-8')))
+               else:
+                   print(format(host[u"host"].encode('utf-8')))
     else:
        sys.exit("Error: No hosts linked with \""+ tmpl_name +"\"")
 else:

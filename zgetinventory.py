@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
 # import needed modules.
 # pyzabbix is needed, see https://github.com/lukecyca/pyzabbix
