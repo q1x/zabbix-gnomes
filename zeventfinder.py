@@ -101,11 +101,11 @@ group.add_argument('-G', '--hostgroups' ,help='Hostgroup(s) to find events for',
 group.add_argument('-T', '--triggerids' ,help='Triggerid(s) to find events for', type=int, nargs='+')
 group.add_argument('--all-hosts', help='Find events for all hosts',action='store_true')
 parser.add_argument('-n', '--numeric', help='Use numeric ids instead of names, applies to -H and -G',action='store_true')
-parser.add_argument('-L', '--limit', help='Limit the number of returned lines, default is 100',default=100,type=int)
+parser.add_argument('-L', '--limit', help='Limit the number of returned lines, default is 100. Set to 0 to disable.',default=100,type=int)
 group2.add_argument('-P', '--problem', help='Only show PROBLEM events', action='store_true')
 group2.add_argument('-O', '--ok', help='Only show OK events', action='store_true')
 parser.add_argument('-A', '--ack', help='Only show Acknowledged events', action='store_true')
-parser.add_argument('-t', '--time-period', help='Timeperiod in seconds (default is one week)', type=int, default=604800)
+parser.add_argument('-t', '--time-period', help='Timeperiod in seconds, default is one week. Set to 0 to disable.', type=int, default=604800)
 group3.add_argument('-s', '--start-time', help='Unix timestamp to search from', type=int)
 group3.add_argument('-f', '--follow', help='Follow events as they occur', action='store_true')
 parser.add_argument('-i', '--ids', help='Output only eventids',action='store_true')
@@ -178,7 +178,9 @@ zapi.login(username, password)
 
 # Base API call
 call={'sortfield': 'clock', 'sortorder': 'DESC', 'output': 'extend', 'source': 0}
-call['limit']=args.limit
+
+if args.limit!=0:
+        call['limit']=args.limit
 
 if args.ids:
         call['output']='eventid'
@@ -198,7 +200,7 @@ if args.ack:
 if args.start_time:
         call['time_from']=args.start_time
 
-if args.time_period:
+if args.time_period!=0:
         if args.start_time:
             call['time_till']=args.start_time+args.time_period
         else:
