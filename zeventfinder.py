@@ -260,7 +260,7 @@ elif args.hostnames:
        hids = []
        for h in range(len(hlookup)):
           # Create the list of hostgroup ids
-          hids.append(int(hglookup[h]['hostid']))
+          hids.append(int(hlookup[h]['hostid']))
 
     if len(hids)>0:
         call['hostids']=hids
