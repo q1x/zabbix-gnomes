@@ -55,6 +55,7 @@ parser.add_argument('-c','--config', help='Config file location (defaults to $HO
 parser.add_argument('-n', '--numeric', help='Return numeric hostids instead of host name',action='store_true')
 parser.add_argument('-e', '--extended', help='Return both hostids and host names separated with a ":"',action='store_true')
 parser.add_argument('-V', '--visible-name', help='Return visible name instead of technical name', action='store_true')
+parser.add_argument('-m', '--monitored', help='Only return monitored hosts', action='store_true')
 args = parser.parse_args()
 
 # load config module
@@ -123,7 +124,10 @@ templateid = template[0]["templateid"]
 
 if templateid:
     # Find linked hosts
-    hosts = zapi.host.get(output="extend", templateids=templateid) 
+    if args.monitored:
+        hosts = zapi.host.get(output="extend", templateids=templateid, monitored_hosts='1') 
+    else:
+        hosts = zapi.host.get(output="extend", templateids=templateid) 
     if hosts:
       if args.extended:
         # print ids and names
