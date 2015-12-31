@@ -181,8 +181,14 @@ if graph:
   # setup a session object so we can reuse session cookies
   session=requests.session()
 
+
+  if noverify == True:
+    verify=False
+  else:
+    verify=True
+
   # Login to the frontend
-  login=session.post(loginurl, params=logindata, headers=headers) 
+  login=session.post(loginurl, params=logindata, headers=headers, verify=verify) 
 
   # See if we logged in successfully
   try:
@@ -192,13 +198,16 @@ if graph:
        graphurl = api + "/" + generator + "?graphid=" + str(graphid) + "&period=" + str(period) + "&width=" + str(width) + "&height=" + str(height) + "&stime=" + str(stime)
 
        # get the graph
-       graphreq = session.get(graphurl)
+       graphreq = session.get(graphurl,verify=verify)
 
        # read the data as an image
        graphpng = Image.open(StringIO(graphreq.content))
 
        # and write it to file
-       graphpng.save(args.filename)
+       if  args.filename == "-":
+            graphpng.save(sys.stdout, "PNG")
+       else:
+            graphpng.save(args.filename)
 
   except:
        sys.exit("Error: Could not log in to retrieve graph")
