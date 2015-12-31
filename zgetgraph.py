@@ -56,7 +56,7 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
 
 """)
 parser.add_argument('graphid', help='The graph that we are going to download')
-parser.add_argument('-f', '--filename', required=True, help='filename to save the graph to')
+parser.add_argument('-f', '--filename', required=True, help='filename to save the graph to, use - to use stdout')
 parser.add_argument('-u', '--username', help='User for the Zabbix api and frontend')
 parser.add_argument('-p', '--password', help='Password for the Zabbix user')
 parser.add_argument('-a', '--api', help='Zabbix URL')
