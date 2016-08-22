@@ -35,6 +35,7 @@ All of these tools can be invoked with `-h/--help` to get help.
 - `zhproxyfinder.py` -	Finds configured proxy for a Zabbix host.
 
 ### Template related:
+- `ztmplimport.py'  -   Imports .xml template into zabbix
 - `zhtmplfinder.py` - 	Finds linked templates for a Zabbix host.
 - `zthostfinder.py` - 	Finds hosts that are linked to a template.
 - `zthtmllinker.py` - 	Links host(group)s to a list of templates.
@@ -102,6 +103,12 @@ zabbix_sender -k $ITEMKEY -o $ITEMVALUE -s $HOSTNAME -z $(zhproxyfinder.py $HOST
 
 ```
 ./zhtmplunlink.py -G "Webservers" -t "Template App MySQL"
+```
+
+##### Import all .xml templates verbosely from the directory 'templates' and continue with the next template on error.
+
+```
+./ztmplimport.py -v -C ./templates/*.xml
 ```
 
 #### Get the latest item value from history for the item with itemid 1001
