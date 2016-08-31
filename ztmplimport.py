@@ -59,9 +59,8 @@ parser.add_argument('-c','--config', help='Config file location (defaults to $HO
 parser.add_argument('-v', '--verbose', help='Enables verbose output.',action='store_true') 
 parser.add_argument('-T', '--templates', help='List of XML template files to import.',required=True, nargs="+")
 parser.add_argument('-D', '--delete-missing', help='If a template already exists in Zabbix, any missing elements from the .XML will be removed from Zabbix as well.',action='store_true')
+parser.add_argument('-U', '--update', help='If a template already exists in Zabbix, update any changes in template elements.',action='store_true')
 parser.add_argument('-C', '--continue-on-error', help='Continue on error, use with caution.',action='store_true')
-# Doesn't work as expected...removed for now 
-#parser.add_argument('-U', '--dont-update', help='If a template already exists in Zabbix, the template will not be updated.',action='store_true')
 
 args = parser.parse_args()
 
@@ -129,11 +128,10 @@ zversion=zapi.apiinfo.version()
 
 # set import modes
 create=True
-update=True
-#if args.dont_update:
-#   update=False
-#else:
-#   update=True
+if args.update:
+   update=True
+else:
+   update=False
 
 if args.delete_missing:
    delete=True
@@ -188,7 +186,7 @@ for template in args.templates:
                 print("Succesfully imported " + template)
         except:
             # Something went wrong with the API call or import
-            error="Error: Something went wrong while importing "+ template
+            error="Error: Something went wrong while importing " + template + "\n" + str(sys.exc_info()[1][0])
 	    PrintError(error)
             Continue=False
 
