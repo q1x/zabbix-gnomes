@@ -11,6 +11,7 @@ import distutils.util
 import cmd
 import traceback
 import sys
+from pprint import pprint
 from pyzabbix import ZabbixAPI
 
 
@@ -130,7 +131,7 @@ class zinteractive(cmd.Cmd):
 	try:
 	  result=eval(call)
 	  if result:
-	   print(result)
+	   pprint(result)
 	  else:
 	   print("No data.")
         except:
