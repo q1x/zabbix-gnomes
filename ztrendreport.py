@@ -103,7 +103,7 @@ api = ""
 noverify = ""
 
 # Define commandline arguments
-parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Prints a CSV trend report for daily max, min or average values for the specied item key.', epilog="""
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Prints a CSV trend report for daily max, min or average values for the specified item key.', epilog="""
 This program can use .ini style configuration files to retrieve the needed API connection information.
 To use this type of storage, create a conf file (the default is $HOME/.zbx.conf) that contains at least the [Zabbix API] section and any of the other parameters:
 
