@@ -284,7 +284,7 @@ try:
                             print(eventid)            
                 else:
                     triggerids=[event['objectid'] for event in events]
-                    triggers=zapi.trigger.get(triggerids=triggerids,output='extend',expandData=1,expandDescription=1,preservekeys=1,expandComment=1)
+                    triggers=zapi.trigger.get(triggerids=triggerids,output='extend',expandDescription=1,preservekeys=1,expandComment=1,selectHosts='extend')
                     for event in sorted(events):
                         eventid=event['eventid']
                         etime=timestr(event['clock'])
@@ -293,7 +293,7 @@ try:
                         triggerid="<Unknown Triggerid>"
                         severity="<Unknown Severity>"
                         try:
-                            hostname=triggers[event['objectid']]['host']
+                            hostname=triggers[event['objectid']]['hosts'][0]['host']
                             trigger=triggers[event['objectid']]['description']
                             severity=severitymap(triggers[event['objectid']]['priority'])
                             triggerid=event['objectid']

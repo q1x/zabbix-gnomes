@@ -235,7 +235,7 @@ if args.acks:
 events=zapi.event.get(**call)
 if events:
         triggerids=[event['objectid'] for event in events]
-        triggers=zapi.trigger.get(triggerids=triggerids,output='extend',expandData=1,expandDescription=1,preservekeys=1,expandComment=1)
+        triggers=zapi.trigger.get(triggerids=triggerids,output='extend',expandDescription=1,preservekeys=1,expandComment=1,selectHosts='extend')
         for event in events:
                 eventid=event['eventid']
                 time=timestr(event['clock'])
@@ -246,7 +246,7 @@ if events:
                 triggerid="<Unknown Triggerid>"
                 severity="<Unknown Severity>"
                 try:
-                    hostname=triggers[event['objectid']]['host']
+                    hostname=triggers[event['objectid']]['hosts'][0]['host']
                     severity=severitymap(triggers[event['objectid']]['priority'])
                     trigger=triggers[event['objectid']]['description']
                     triggerid=event['objectid']
