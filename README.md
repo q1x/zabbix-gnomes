@@ -35,7 +35,7 @@ All of these tools can be invoked with `-h/--help` to get help.
 - `zhproxyfinder.py` -	Finds configured proxy for a Zabbix host.
 
 ### Template related:
-- `ztmplimport.py'  -   Imports .xml template into zabbix
+- `ztmplimport.py`  -   Imports .xml template into zabbix
 - `zhtmplfinder.py` - 	Finds linked templates for a Zabbix host.
 - `zthostfinder.py` - 	Finds hosts that are linked to a template.
 - `zthtmllinker.py` - 	Links host(group)s to a list of templates.
