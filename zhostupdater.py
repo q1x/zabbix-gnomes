@@ -172,7 +172,11 @@ if host_name:
                       if '=' in field:
                              # Create macro object with proper value
                              field=field.split('=')
-                             name=unicode("{$" + field[0].upper() + "}")
+                             if ':' in field[0]:
+                                   # context-macro contains ':', only uppercase macro name
+                                   name=unicode("{$" + field[0].split(':')[0].upper() + ':' + field[0].split(':')[1] + "}")
+                             else:
+                                   name=unicode("{$" + field[0].upper() + "}")
                              value=unicode(field[1])
                              macro={"macro":name,"value":value}
                              zbxmac.append(macro)
