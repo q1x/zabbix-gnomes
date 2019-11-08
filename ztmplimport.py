@@ -141,7 +141,7 @@ else:
 # set import rules, see https://www.zabbix.com/documentation/3.0/manual/api/reference/configuration/import
 rules={}
 rules['templates']={'createMissing': create, 'updateExisting':update}
-rules['applications']={'createMissing': create, 'updateExisting': update, 'deleteMissing': delete}
+rules['applications']={'createMissing': create, 'deleteMissing': delete}
 rules['discoveryRules']={'createMissing': create, 'updateExisting': update, 'deleteMissing': delete}
 rules['graphs']={'createMissing': create, 'updateExisting':update, 'deleteMissing': delete}
 rules['groups']={'createMissing': create}
