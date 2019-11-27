@@ -150,8 +150,16 @@ rules['templateLinkage']={'createMissing': create}
 rules['templateScreens']={'createMissing': create, 'updateExisting':update, 'deleteMissing': delete}
 rules['triggers']={'createMissing': create, 'updateExisting':update, 'deleteMissing': delete}
 # Valuemap imports are a Zabbix 3.x.x feature
+# applications rules are not the same starting at Zabbix version >= 3.4.z : no more updateExisting
 if zversion.startswith('3.'):
     rules['valueMaps']={'createMissing':create, 'updateExisting':update}
+	
+if zversion.startswith('3.4.'):
+    rules['applications']={'createMissing':create, 'deleteMissing': delete}
+	
+elif zversion.startswith('4.'):
+    rules['applications']={'createMissing':create, 'deleteMissing': delete}
+	rules['valueMaps']={'createMissing':create, 'updateExisting':update}
 
 # Parse file list 
 for template in args.templates:
