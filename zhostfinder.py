@@ -45,9 +45,13 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
  no_verify=true
 
 """)
-group = parser.add_mutually_exclusive_group(required=True)
+
+group=parser.add_argument_group("Query Options - they are cumulative")
+
 group.add_argument('-S', '--search', help='Hostname string to find in Zabbix')
 group.add_argument('-A', '--all', help='Returns all hosts Zabbix',action='store_true')
+group.add_argument('-I', '--ip', help='IP to find in zabbix')
+
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
@@ -119,13 +123,15 @@ zapi.login(username, password)
 
 # Find the hostgroup we are looking for
 search_name = args.search
+search_ip = args.ip
 
-if search_name: 
-    # Find matching hosts
+
+if search_name or search_ip: 
+    # Find matching hosts    
     if args.monitored:
-      hosts = zapi.host.get(output="extend", monitored_hosts=True, search={"host":search_name}) 
+      hosts = zapi.host.get(output="extend", monitored_hosts=True, search={"host":search_name, "ip":search_ip}) 
     else:
-      hosts = zapi.host.get(output="extend", search={"host":search_name})
+      hosts = zapi.host.get(output="extend", search={"host":search_name, "ip":search_ip})
 elif args.all:
     # Find matching hosts
     if args.monitored:
@@ -150,6 +156,10 @@ if hosts:
   	 for host in hosts:
              print(format(host["host"]))
 else:
-  sys.exit("Error: Could not find any hosts matching \""+ search_name + "\"")
+	if search_name:
+ 		sys.exit("Error: Could not find any hosts matching name \""+ search_name + "\"")
+	elif search_ip:
+ 		sys.exit("Error: Could not find any hosts matching ip \""+ search_ip + "\"")
+	 
 
 # And we're done...
