@@ -45,9 +45,16 @@ To use this type of storage, create a conf file (the default is $HOME/.zbx.conf)
  no_verify=true
 
 """)
-group = parser.add_mutually_exclusive_group(required=True)
+
+group=parser.add_argument_group("Query Options - can be combined together")
+
 group.add_argument('-S', '--search', help='Hostname string to find in Zabbix')
 group.add_argument('-A', '--all', help='Returns all hosts Zabbix',action='store_true')
+group.add_argument('-I', '--ip', help='IP to find in zabbix')
+group.add_argument('-G', '--group', help='Group to find in zabbix')
+group.add_argument('-D', '--dnsname', help='hostname to find in zabbix')
+
+
 parser.add_argument('-u', '--username', help='User for the Zabbix api')
 parser.add_argument('-p', '--password', help='Password for the Zabbix api user')
 parser.add_argument('-a', '--api', help='Zabbix API URL')
@@ -119,22 +126,34 @@ zapi.login(username, password)
 
 # Find the hostgroup we are looking for
 search_name = args.search
+search_ip = args.ip
+search_group = args.group
+search_dns_name = args.dnsname
 
-if search_name: 
-    # Find matching hosts
-    if args.monitored:
-      hosts = zapi.host.get(output="extend", monitored_hosts=True, search={"host":search_name}) 
-    else:
-      hosts = zapi.host.get(output="extend", search={"host":search_name})
-elif args.all:
-    # Find matching hosts
-    if args.monitored:
-      hosts = zapi.host.get(output="extend", monitored_hosts=True)
-    else:
-      hosts = zapi.host.get(output="extend")
-else:
-   sys.exit("Error: No hosts to find")
+if not search_name and not search_ip and not search_group and not search_dns_name and not args.all:
+	sys.exit("Error: No hosts to find")
+	   
+	
+# Find matching hosts
+group_id=""    
 
+if search_group:
+	group = zapi.hostgroup.get(output="extend", filter=({'name': search_group}))
+	if group:
+		group_id = group[0]["groupid"]
+	else:
+		sys.exit("Error: Could not find any group \""+ search_group + "\"")
+
+queryDict={"search": {"host":search_name, "ip":search_ip, "group":search_group, "dns":search_dns_name}}
+
+if group_id:
+	queryDict["groupids"]=group_id
+if args.monitored:
+	queryDict["monitored_hosts"]=args.monitored
+
+hosts = zapi.host.get(output="extend", **queryDict)
+
+	
 if hosts:
   if args.extended:
      # print ids and names
@@ -150,6 +169,10 @@ if hosts:
   	 for host in hosts:
              print(format(host["host"]))
 else:
-  sys.exit("Error: Could not find any hosts matching \""+ search_name + "\"")
+	if search_name:
+ 		sys.exit("Error: Could not find any hosts matching name \""+ search_name + "\"")
+	elif search_ip:
+ 		sys.exit("Error: Could not find any hosts matching ip \""+ search_ip + "\"")
+	 
 
 # And we're done...

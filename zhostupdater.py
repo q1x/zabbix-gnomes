@@ -56,6 +56,7 @@ parser.add_argument('-a', '--api', help='Zabbix API URL')
 parser.add_argument('--no-verify', help='Disables certificate validation when using a secure connection',action='store_true') 
 parser.add_argument('-c','--config', help='Config file location (defaults to $HOME/.zbx.conf)')
 parser.add_argument('-N', '--name', help='Update hostname')
+parser.add_argument('-n', '--numeric', help='Provide a host ID instead of a name', action='store_true')
 group.add_argument('-V', '--visible-name', help='Update visible name')
 group.add_argument('-S', '--sync-names', help='Sets hostname and visible name to the name specified with -N',action='store_true')
 parser.add_argument('-I', '--inventory', help='Update inventory fields. Specify each field as \'fieldname="value"\'.', nargs='+')
@@ -133,8 +134,12 @@ host_name = args.host
 call={}
 
 if host_name: 
+    if args.numeric:
+        filterField = "hostid"
+    else:
+        filterField = "host"
     # Find matching hosts
-    hosts = zapi.host.get(output="extend", selectGroups="extend", selectMacros="extend", filter={"host":host_name}) 
+    hosts = zapi.host.get(output="extend", selectGroups="extend", selectMacros="extend", filter={filterField:host_name}) 
     if hosts:
       # Basic API call params
       call["hostid"]=hosts[0]["hostid"]
