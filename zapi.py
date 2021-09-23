@@ -36,6 +36,7 @@ username = ""
 password = ""
 api = ""
 noverify = ""
+detect_version = True
 
 # Define commandline arguments
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,description='Interactive Zabbix API commandline client.', epilog="""
@@ -91,6 +92,7 @@ if args.api:
 
 if args.no_verify:
  noverify = args.no_verify
+ detect_version=False
 
 # test for needed params
 if not username:
@@ -106,7 +108,7 @@ if not api:
  exit()
 
 # Setup Zabbix API connection
-zapi = ZabbixAPI(api)
+zapi = ZabbixAPI(api, detect_version)
 
 if noverify is True:
  zapi.session.verify = False
