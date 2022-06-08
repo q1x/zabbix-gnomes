@@ -1,10 +1,13 @@
 #!/usr/bin/env python
-#
+# adapted for pythonV3
 # import needed modules.
 # pyzabbix is needed, see https://github.com/lukecyca/pyzabbix
 #
 import argparse
-import ConfigParser
+try:
+    from configparser import ConfigParser
+except ImportError:
+    from ConfigParser import SafeConfigParser as ConfigParser
 import os
 import os.path
 import sys
@@ -16,13 +19,13 @@ def ConfigSectionMap(section):
     dict1 = {}
     options = Config.options(section)
     for option in options:
- 	try:
-		dict1[option] = Config.get(section, option)
-		if dict1[option] == -1:
-			DebugPrint("skip: %s" % option)
-	except:
-		print("exception on %s!" % option)
-		dict1[option] = None
+        try:
+          dict1[option] = Config.get(section, option)
+          if dict1[option] == -1:
+            print("skip: %s" % option)
+        except:
+          print("exception on %s!" % option)
+          dict1[option] = None
     return dict1
 
 
@@ -57,7 +60,7 @@ parser.add_argument('-m', '--monitored', help='Only return hosts that are being 
 args = parser.parse_args()
 
 # load config module
-Config = ConfigParser.ConfigParser()
+Config = ConfigParser()
 Config
 
 # if configuration argument is set, test the config file
@@ -109,7 +112,7 @@ if noverify is True:
  zapi.session.verify = False
 
 # Login to the Zabbix API
-zapi.login(username, password)
+zapi = ZabbixAPI(url=api, user=username, password=password)
 
 ##################################
 # Start actual API logic
@@ -134,12 +137,12 @@ if group:
       else:
         if args.numeric:
            # print host ids
-  	 for host in hosts:
-  	   print(format(host["hostid"]))
+         for host in hosts:
+            print(format(host["hostid"]))
         else:
-           # print host names
-  	 for host in hosts:
-             print(format(host["host"]))
+               # print host names
+         for host in hosts:
+                  print(format(host["host"]))
     else:
        sys.exit("Error: No hosts in hostgroup \""+ group_name + "\"")
 else:
